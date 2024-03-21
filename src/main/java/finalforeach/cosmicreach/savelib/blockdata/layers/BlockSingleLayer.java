@@ -1,5 +1,7 @@
 package finalforeach.cosmicreach.savelib.blockdata.layers;
 
+import finalforeach.cosmicreach.savelib.IChunkByteWriter;
+import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.blockdata.LayeredBlockData;
 
 public class BlockSingleLayer<T> implements IBlockLayer<T>
@@ -52,6 +54,32 @@ public class BlockSingleLayer<T> implements IBlockLayer<T>
 		if(!chunkData.paletteHasValue(blockValue)) 
 		{
 			chunkData.addToPalette(blockValue);
+		}
+	}
+
+	@Override
+	public int getSaveFileConstant(LayeredBlockData<T> chunkData) 
+	{
+		int paletteId = chunkData.getBlockValueID(blockValue);
+		if(paletteId <= 255) 
+		{
+			return SaveFileConstants.LAYER_SINGLE_BYTE;
+		}else 
+		{
+			return SaveFileConstants.LAYER_SINGLE_INT;
+		}
+	}
+
+	@Override
+	public void writeTo(LayeredBlockData<T> chunkData, IChunkByteWriter allChunksWriter) 
+	{
+		int paletteId = chunkData.getBlockValueID(blockValue);
+		if(paletteId <= 255) 
+		{
+			allChunksWriter.writeByte(paletteId);
+		}else 
+		{
+			allChunksWriter.writeInt(paletteId);
 		}
 	}
 

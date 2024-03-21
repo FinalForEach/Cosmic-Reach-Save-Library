@@ -1,5 +1,7 @@
 package finalforeach.cosmicreach.savelib.blockdata.layers;
 
+import finalforeach.cosmicreach.savelib.IChunkByteWriter;
+import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.blockdata.LayeredBlockData;
 
 public class BlockHalfNibbleLayer<T> implements IBlockLayer<T>
@@ -82,5 +84,17 @@ public class BlockHalfNibbleLayer<T> implements IBlockLayer<T>
 
 	public byte[] getBytes() {
 		return blockIDs;
+	}
+	
+	@Override
+	public int getSaveFileConstant(LayeredBlockData<T> chunkData) 
+	{
+		return SaveFileConstants.LAYER_HALFNIBBLE;
+	}
+
+	@Override
+	public void writeTo(LayeredBlockData<T> chunkData, IChunkByteWriter allChunksWriter) 
+	{
+		allChunksWriter.writeBytes(getBytes());
 	}
 }

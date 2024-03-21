@@ -1,5 +1,7 @@
 package finalforeach.cosmicreach.savelib.blockdata.layers;
 
+import finalforeach.cosmicreach.savelib.IChunkByteWriter;
+import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.blockdata.LayeredBlockData;
 
 public class BlockByteLayer<T> implements IBlockLayer<T>
@@ -72,5 +74,17 @@ public class BlockByteLayer<T> implements IBlockLayer<T>
 
 	public byte[] getBytes() {
 		return blockIDs;
+	}
+	
+	@Override
+	public int getSaveFileConstant(LayeredBlockData<T> chunkData) 
+	{
+		return SaveFileConstants.LAYER_BYTE;
+	}
+
+	@Override
+	public void writeTo(LayeredBlockData<T> chunkData, IChunkByteWriter allChunksWriter) 
+	{
+		allChunksWriter.writeBytes(getBytes());
 	}
 }

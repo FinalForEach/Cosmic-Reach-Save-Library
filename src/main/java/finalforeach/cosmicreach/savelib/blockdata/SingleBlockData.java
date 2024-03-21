@@ -2,6 +2,9 @@ package finalforeach.cosmicreach.savelib.blockdata;
 
 import java.util.function.Predicate;
 
+import finalforeach.cosmicreach.savelib.IChunkByteWriter;
+import finalforeach.cosmicreach.savelib.SaveFileConstants;
+
 public class SingleBlockData<T> implements IBlockData<T>
 {
 	private T blockValue;
@@ -20,12 +23,12 @@ public class SingleBlockData<T> implements IBlockData<T>
 	}
 	
 	@Override
-	public T getBlockState(int localX, int localY, int localZ) 
+	public T getBlockValue(int localX, int localY, int localZ) 
 	{
 		return blockValue;
 	}
 	@Override
-	public int getBlockStateID(int localX, int localY, int localZ) {
+	public int getBlockValueID(int localX, int localY, int localZ) {
 		return 0;
 	}
 
@@ -82,6 +85,17 @@ public class SingleBlockData<T> implements IBlockData<T>
 	public int getUniqueBlockValuesCount() 
 	{
 		return 1;
+	}
+	
+	@Override
+	public int getSaveFileConstant() 
+	{
+		return SaveFileConstants.SINGLEBLOCK;
+	}
+	@Override
+	public void writeTo(IChunkByteWriter allChunksWriter) 
+	{
+		allChunksWriter.writeBlockValue(blockValue);
 	}
 
 }

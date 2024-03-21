@@ -3,9 +3,10 @@ package finalforeach.cosmicreach.savelib.blockdata;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
+import finalforeach.cosmicreach.savelib.IChunkByteWriter;
+import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockSingleLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.IBlockLayer;
-
 
 public class LayeredBlockData<T> implements IBlockData<T>
 {
@@ -31,13 +32,13 @@ public class LayeredBlockData<T> implements IBlockData<T>
 		return layers;
 	}
 	@Override
-	public T getBlockState(int localX, int localY, int localZ) 
+	public T getBlockValue(int localX, int localY, int localZ) 
 	{
 		return layers[localY].getBlockValue(this, localX, localZ);
 	}
 
 	@Override
-	public int getBlockStateID(int localX, int localY, int localZ) {
+	public int getBlockValueID(int localX, int localY, int localZ) {
 		return layers[localY].getBlockValueID(this, localX, localZ);
 	}
 	@Override
@@ -149,5 +150,28 @@ public class LayeredBlockData<T> implements IBlockData<T>
 	{
 		return getBlockValueID(blockValue) != -1;
 	}
-	
+
+	@Override
+	public int getSaveFileConstant() 
+	{
+		return SaveFileConstants.LAYERED;
+	}
+	@Override
+	public void writeTo(IChunkByteWriter allChunksWriter) 
+	{
+		// Write the palette of the layered block data
+		int paletteSize = getPaletteSize();
+		allChunksWriter.writeInt(paletteSize);
+		for(int i = 0; i < paletteSize; i++) 
+		{
+			allChunksWriter.writeBlockValue(getBlockValueFromPaletteId(i));
+		}
+		
+		// Then write for the individual layers...
+		for(var layer : getLayers())
+		{
+			allChunksWriter.writeByte(layer.getSaveFileConstant(this));
+			layer.writeTo(this, allChunksWriter);
+		}
+	}
 }
