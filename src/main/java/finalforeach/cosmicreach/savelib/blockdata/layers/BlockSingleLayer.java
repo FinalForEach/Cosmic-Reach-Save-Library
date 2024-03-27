@@ -63,10 +63,10 @@ public class BlockSingleLayer<T> implements IBlockLayer<T>
 		int paletteId = chunkData.getBlockValueID(blockValue);
 		if(paletteId <= 255) 
 		{
-			return SaveFileConstants.LAYER_SINGLE_BYTE;
+			return SaveFileConstants.BLOCK_LAYER_SINGLE_BYTE;
 		}else 
 		{
-			return SaveFileConstants.LAYER_SINGLE_INT;
+			return SaveFileConstants.BLOCK_LAYER_SINGLE_INT;
 		}
 	}
 

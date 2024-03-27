@@ -10,4 +10,6 @@ public interface IChunkByteWriter {
 
 	void writeBytes(byte[] bytes);
 
+	void writeShorts(short[] shorts);
+
 }

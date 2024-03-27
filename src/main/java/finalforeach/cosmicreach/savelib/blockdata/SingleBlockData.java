@@ -90,7 +90,7 @@ public class SingleBlockData<T> implements IBlockData<T>
 	@Override
 	public int getSaveFileConstant() 
 	{
-		return SaveFileConstants.SINGLEBLOCK;
+		return SaveFileConstants.BLOCK_SINGLE;
 	}
 	@Override
 	public void writeTo(IChunkByteWriter allChunksWriter) 

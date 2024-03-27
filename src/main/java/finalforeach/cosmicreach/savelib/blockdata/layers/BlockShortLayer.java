@@ -1,21 +1,25 @@
 package finalforeach.cosmicreach.savelib.blockdata.layers;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 import finalforeach.cosmicreach.savelib.IChunkByteWriter;
+import finalforeach.cosmicreach.savelib.ISavedChunk;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.blockdata.LayeredBlockData;
 
-public class BlockByteLayer<T> implements IBlockLayer<T>
+public class BlockShortLayer<T> implements IBlockLayer<T>
 {
-	private final byte[] blockIDs;
+	private final short[] blockIDs;
 
-	public BlockByteLayer(byte[] bytes) 
+	public BlockShortLayer(short[] shorts) 
 	{
-		this.blockIDs = bytes;
+		this.blockIDs = shorts;
 	}
 
-	public BlockByteLayer(LayeredBlockData<T> chunkData, int localY, T blockValue) 
+	public BlockShortLayer(LayeredBlockData<T> chunkData, int localY, T blockValue) 
 	{
-		this.blockIDs = new byte[CHUNK_WIDTH * CHUNK_WIDTH];
+		this.blockIDs = new short[NUM_BLOCKS_IN_LAYER];
 		for(int i = 0; i < CHUNK_WIDTH; i++) 
 		{
 			for(int k = 0; k < CHUNK_WIDTH; k++) 
@@ -25,14 +29,14 @@ public class BlockByteLayer<T> implements IBlockLayer<T>
 		}
 	}
 	
-	public BlockByteLayer(LayeredBlockData<T> chunkData, int localY, BlockNibbleLayer<T> nibbleLayer) 
-	{
-		this.blockIDs = new byte[CHUNK_WIDTH * CHUNK_WIDTH];
+	public BlockShortLayer(LayeredBlockData<T> chunkData, int localY, BlockByteLayer<T> blockByteLayer) {
+
+		this.blockIDs = new short[NUM_BLOCKS_IN_LAYER];
 		for(int i = 0; i < CHUNK_WIDTH; i++) 
 		{
 			for(int k = 0; k < CHUNK_WIDTH; k++) 
 			{
-				setBlockValue(chunkData, nibbleLayer.getBlockValue(chunkData, i, k), i, localY, k);
+				setBlockValue(chunkData, blockByteLayer.getBlockValue(chunkData, i, k), i, localY, k);
 			}
 		}
 	}
@@ -45,9 +49,9 @@ public class BlockByteLayer<T> implements IBlockLayer<T>
 	@Override
 	public int getBlockValueID(LayeredBlockData<T> chunkData, int localX, int localZ) {
 		int idx = localX + (localZ * CHUNK_WIDTH);
-		byte blockID = blockIDs[idx];
+		short blockID = blockIDs[idx];
 
-		return blockID & 0xFF;
+		return blockID;
 	}
 
 	@Override
@@ -60,17 +64,10 @@ public class BlockByteLayer<T> implements IBlockLayer<T>
 		
 		int fullPaletteID = chunkData.getBlockValueID(blockValue);
 		
-		if(fullPaletteID > 255)
+		if(fullPaletteID > ISavedChunk.NUM_BLOCKS_IN_CHUNK - 1)
 		{
 			chunkData.cleanPalette();
-			if(chunkData.getPaletteSize() <= 255) 
-			{
-				chunkData.setBlockValue(blockValue, localX, localY, localZ);
-				return;
-			}
-			final var layer = new BlockShortLayer<T>(chunkData, localY, this);
-			layer.setBlockValue(chunkData, blockValue, localX, localY, localZ);
-			chunkData.setLayer(localY, layer);
+			chunkData.setBlockValue(blockValue, localX, localY, localZ);
 			return;
 		}
 		
@@ -78,23 +75,31 @@ public class BlockByteLayer<T> implements IBlockLayer<T>
 		if(blockValue!=oldBlock) 
 		{
 			final int idx = localX + (localZ * CHUNK_WIDTH);
-			blockIDs[idx] = (byte) fullPaletteID;
+			blockIDs[idx] = (short)fullPaletteID;
 		}
-	}
-
-	public byte[] getBytes() {
-		return blockIDs;
 	}
 	
 	@Override
 	public int getSaveFileConstant(LayeredBlockData<T> chunkData) 
 	{
-		return SaveFileConstants.BLOCK_LAYER_BYTE;
+		return SaveFileConstants.BLOCK_LAYER_SHORT;
 	}
 
+	// TODO: Have more generic readFrom method
+	public static <T> BlockShortLayer<T> fromRandomAccessFileShortArray(RandomAccessFile raf) throws IOException 
+	{
+		BlockShortLayer<T> layer = new BlockShortLayer<T>(new short[NUM_BLOCKS_IN_LAYER]);
+		int l = layer.blockIDs.length;
+		for(int i = 0; i < l; i++) 
+		{
+			layer.blockIDs[i] = raf.readShort(); 
+		}
+		return layer;
+	}
+	
 	@Override
 	public void writeTo(LayeredBlockData<T> chunkData, IChunkByteWriter allChunksWriter) 
 	{
-		allChunksWriter.writeBytes(getBytes());
+		allChunksWriter.writeShorts(blockIDs);
 	}
 }

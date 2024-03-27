@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.function.Predicate;
 
 import finalforeach.cosmicreach.savelib.IChunkByteWriter;
+import finalforeach.cosmicreach.savelib.ISavedChunk;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockSingleLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.IBlockLayer;
@@ -16,6 +17,8 @@ public class LayeredBlockData<T> implements IBlockData<T>
 	@SuppressWarnings("unchecked")
 	private T[] blockStatePalette = (T[])new Object[8];
 	private int paletteSize = 0;
+
+	private boolean allowCleaning = true;
 
 	public LayeredBlockData() {}
 	public LayeredBlockData(T defaultBlockState)
@@ -154,7 +157,7 @@ public class LayeredBlockData<T> implements IBlockData<T>
 	@Override
 	public int getSaveFileConstant() 
 	{
-		return SaveFileConstants.LAYERED;
+		return SaveFileConstants.BLOCK_LAYERED;
 	}
 	@Override
 	public void writeTo(IChunkByteWriter allChunksWriter) 
@@ -172,6 +175,43 @@ public class LayeredBlockData<T> implements IBlockData<T>
 		{
 			allChunksWriter.writeByte(layer.getSaveFileConstant(this));
 			layer.writeTo(this, allChunksWriter);
+		}
+	}
+	public void cleanPalette() 
+	{
+		if(!allowCleaning) 
+		{
+			// Prevents possible infinite recursions
+			return;
+		}
+		
+		int currentPaletteSize = getPaletteSize();
+		
+		LayeredBlockData<T> tempBlockData = new LayeredBlockData<>(getBlockValue(0, 0, 0));
+		tempBlockData.allowCleaning  = false;
+		for(int i = 0; i < CHUNK_WIDTH; i++) 
+		{
+			for(int j = 0; j < CHUNK_WIDTH; j++) 
+			{
+				for(int k = 0; k < CHUNK_WIDTH; k++) 
+				{
+					tempBlockData.setBlockValue(getBlockValue(i, j, k), i, j, k);
+				}
+			}
+		}
+		
+		paletteSize = tempBlockData.paletteSize;
+		blockStatePalette = tempBlockData.blockStatePalette;
+		layers = tempBlockData.layers;
+		
+		int numRemoved = currentPaletteSize - tempBlockData.paletteSize;
+		
+		
+		
+		System.out.println("Cleaned up " + numRemoved + " blockstates from palette.");
+		if(getPaletteSize() > ISavedChunk.NUM_BLOCKS_IN_CHUNK) 
+		{
+			throw new RuntimeException("Failed to clean palette: This should never happen.");
 		}
 	}
 }

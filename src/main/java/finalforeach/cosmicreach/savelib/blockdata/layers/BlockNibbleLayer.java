@@ -102,7 +102,7 @@ public class BlockNibbleLayer<T> implements IBlockLayer<T>
 	@Override
 	public int getSaveFileConstant(LayeredBlockData<T> chunkData) 
 	{
-		return SaveFileConstants.LAYER_NIBBLE;
+		return SaveFileConstants.BLOCK_LAYER_NIBBLE;
 	}
 
 	@Override

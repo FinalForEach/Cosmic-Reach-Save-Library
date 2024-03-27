@@ -89,7 +89,7 @@ public class BlockHalfNibbleLayer<T> implements IBlockLayer<T>
 	@Override
 	public int getSaveFileConstant(LayeredBlockData<T> chunkData) 
 	{
-		return SaveFileConstants.LAYER_HALFNIBBLE;
+		return SaveFileConstants.BLOCK_LAYER_HALFNIBBLE;
 	}
 
 	@Override
