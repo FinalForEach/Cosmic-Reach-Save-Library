@@ -2,7 +2,7 @@ package finalforeach.cosmicreach.savelib.blocks;
 
 import finalforeach.cosmicreach.savelib.blockdata.IBlockData;
 
-public interface IBlockDataFactory<T>
+public interface IBlockDataFactory<B extends IBlockState>
 {
-	IBlockData<T> createChunkData();
+	IBlockData<B> createChunkData();
 }
