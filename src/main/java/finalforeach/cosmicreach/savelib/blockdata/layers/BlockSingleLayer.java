@@ -43,8 +43,8 @@ public class BlockSingleLayer<T> implements IBlockLayer<T>
 		}else 
 		{
 			final var layer = new BlockNibbleLayer<T>(chunkData, localY, this.blockValue);
-			layer.setBlockValue(chunkData, blockState, localX, localY, localZ);
 			chunkData.setLayer(localY, layer);
+			layer.setBlockValue(chunkData, blockState, localX, localY, localZ);
 		}
 	}
 

@@ -195,7 +195,8 @@ public class LayeredBlockData<T> implements IBlockData<T>
 			{
 				for(int k = 0; k < CHUNK_WIDTH; k++) 
 				{
-					tempBlockData.setBlockValue(getBlockValue(i, j, k), i, j, k);
+					var curBlockValue = getBlockValue(i, j, k);
+					tempBlockData.setBlockValue(curBlockValue, i, j, k);
 				}
 			}
 		}
