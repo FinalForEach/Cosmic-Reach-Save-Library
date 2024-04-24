@@ -16,7 +16,7 @@ public class SkylightLayeredData implements ISkylightData
 	{
 		for(int i = 0; i < layers.length; i++)
 		{
-			layers[i] = new SkylightDataSingleLayer(i, skylightValue);
+			layers[i] = SkylightDataSingleLayer.getForLightValue(skylightValue);
 		}
 	}
 
@@ -29,7 +29,7 @@ public class SkylightLayeredData implements ISkylightData
 	@Override
 	public void setSkyLight(int lightLevel, int localX, int localY, int localZ)
 	{
-		layers[localY].setSkyLight(this, lightLevel, localX, localZ);
+		layers[localY].setSkyLight(this, lightLevel, localX, localY, localZ);
 	}
 
 	public void setLayer(int yLevel, ISkylightDataLayer skyLightLayer) {

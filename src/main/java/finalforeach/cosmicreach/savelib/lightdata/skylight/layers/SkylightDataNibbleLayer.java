@@ -20,7 +20,7 @@ public class SkylightDataNibbleLayer implements ISkylightDataLayer
 	}
 
 	@Override
-	public void setSkyLight(SkylightLayeredData skylightData, int lightLevel, int localX, int localZ)
+	public void setSkyLight(SkylightLayeredData skylightData, int lightLevel, int localX, int localY, int localZ)
 	{
 		final int idx = (localX + (localZ * CHUNK_WIDTH)) / 2;
 		final int b = lightLevels[idx];

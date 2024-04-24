@@ -5,23 +5,29 @@ import finalforeach.cosmicreach.savelib.lightdata.skylight.SkylightLayeredData;
 
 public class SkylightDataSingleLayer implements ISkylightDataLayer
 {
-	private int yLevel;
+	public static SkylightDataSingleLayer[] allSingleLayerValues = new SkylightDataSingleLayer[16];
+	static 
+	{
+		for(byte i = 0; i < allSingleLayerValues.length; i++) 
+		{
+			allSingleLayerValues[i] = new SkylightDataSingleLayer(i);
+		}
+	}
 	public byte lightLevel;
 	
-	public SkylightDataSingleLayer(int yLevel, byte lightLevel)
+	private SkylightDataSingleLayer(byte lightLevel)
 	{
-		this.yLevel = yLevel;
 		this.lightLevel = lightLevel;
 	}
 
 	@Override
-	public void setSkyLight(SkylightLayeredData skylightData, int lightLevel, int localX, int localZ) 
+	public void setSkyLight(SkylightLayeredData skylightData, int lightLevel, int localX, int localY, int localZ) 
 	{
 		if(this.lightLevel!=lightLevel) 
 		{
 			final var nibbleLayer = new SkylightDataNibbleLayer(this.lightLevel);
-			nibbleLayer.setSkyLight(skylightData, lightLevel, localX, localZ);
-			skylightData.setLayer(yLevel, nibbleLayer);
+			nibbleLayer.setSkyLight(skylightData, lightLevel, localX, localY, localZ);
+			skylightData.setLayer(localY, nibbleLayer);
 		}
 	}
 
@@ -35,6 +41,15 @@ public class SkylightDataSingleLayer implements ISkylightDataLayer
 	public int getSaveFileConstant() 
 	{
 		return SaveFileConstants.SKYLIGHTDATA_LAYER_SINGLE;
+	}
+
+	public static ISkylightDataLayer getForLightValue(byte skylightValue) 
+	{
+		if(skylightValue < 0 || skylightValue > 15) 
+		{
+			throw new RuntimeException("Sky light values are only valid from 0-15, but got: " + skylightValue);
+		}
+		return allSingleLayerValues[skylightValue];
 	}
 
 }

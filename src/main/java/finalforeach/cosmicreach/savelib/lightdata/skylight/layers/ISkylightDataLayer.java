@@ -7,7 +7,7 @@ public interface ISkylightDataLayer
 {
 	static final int CHUNK_WIDTH = ISavedChunk.CHUNK_WIDTH;
 
-	void setSkyLight(SkylightLayeredData skylightData, int lightLevel, int localX, int localZ);
+	void setSkyLight(SkylightLayeredData skylightData, int lightLevel, int localX, int localY, int localZ);
 
 	int getSkyLight(int localX, int localZ);
 
