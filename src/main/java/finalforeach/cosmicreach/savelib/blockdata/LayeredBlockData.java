@@ -65,7 +65,7 @@ public class LayeredBlockData<T> implements IBlockData<T>
 			s.fill(this, localY, blockState);
 		}else 
 		{
-			layers[localY] = SharedBlockSingleLayer.get(this, blockState);//new BlockSingleLayer<T>(this, blockState);
+			layers[localY] = SharedBlockSingleLayer.get(this, blockState);
 		}
 
 		for(int i = 0; i < CHUNK_WIDTH; i++) 
