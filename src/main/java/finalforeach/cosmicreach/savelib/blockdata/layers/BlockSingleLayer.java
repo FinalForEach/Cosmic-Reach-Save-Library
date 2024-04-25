@@ -48,7 +48,7 @@ public class BlockSingleLayer<T> implements IBlockLayer<T>
 		}
 	}
 
-	public void fill(LayeredBlockData<T> chunkData, T blockValue) 
+	public void fill(LayeredBlockData<T> chunkData, int localY, T blockValue) 
 	{
 		this.blockValue = blockValue;
 		if(!chunkData.paletteHasValue(blockValue)) 

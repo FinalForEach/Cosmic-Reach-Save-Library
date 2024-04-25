@@ -8,6 +8,7 @@ import finalforeach.cosmicreach.savelib.ISavedChunk;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockSingleLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.IBlockLayer;
+import finalforeach.cosmicreach.savelib.blockdata.layers.SharedBlockSingleLayer;
 
 public class LayeredBlockData<T> implements IBlockData<T>
 {
@@ -61,10 +62,10 @@ public class LayeredBlockData<T> implements IBlockData<T>
 	{
 		if(layers[localY] instanceof BlockSingleLayer<T> s) 
 		{
-			s.fill(this, blockState);
+			s.fill(this, localY, blockState);
 		}else 
 		{
-			layers[localY] = new BlockSingleLayer<T>(this, blockState);
+			layers[localY] = SharedBlockSingleLayer.get(this, blockState);//new BlockSingleLayer<T>(this, blockState);
 		}
 
 		for(int i = 0; i < CHUNK_WIDTH; i++) 

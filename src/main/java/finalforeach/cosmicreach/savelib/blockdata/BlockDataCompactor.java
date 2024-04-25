@@ -2,6 +2,7 @@ package finalforeach.cosmicreach.savelib.blockdata;
 
 import finalforeach.cosmicreach.savelib.ISavedChunk;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockSingleLayer;
+import finalforeach.cosmicreach.savelib.blockdata.layers.SharedBlockSingleLayer;
 
 public class BlockDataCompactor 
 {
@@ -41,7 +42,7 @@ public class BlockDataCompactor
 				if(layerBlockState!=null) 
 				{
 					// Replace the layer with the compact equivalent!
-					var newLayer = new BlockSingleLayer<T>(layered, layerBlockState);
+					var newLayer = SharedBlockSingleLayer.get(layered, layerBlockState);
 					layered.setLayer(yLevel, newLayer);
 				}
 			}
