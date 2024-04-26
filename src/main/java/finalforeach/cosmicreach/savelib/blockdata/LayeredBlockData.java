@@ -111,6 +111,13 @@ public class LayeredBlockData<T> implements IBlockData<T>
 
 	public void setLayer(int yLevel, IBlockLayer<T> layer) 
 	{
+		if(layer instanceof SharedBlockSingleLayer<T> shared) 
+		{
+			if(!paletteHasValue(shared.blockValue)) 
+			{
+				addToPalette(shared.blockValue);
+			}
+		}
 		layers[yLevel] = layer;
 	}
 

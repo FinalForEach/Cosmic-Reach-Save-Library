@@ -8,7 +8,7 @@ public interface ISkylightData
 	
 	int getSkyLight(int localX, int localY, int localZ);
 	
-	void setSkyLight(int lightLevel, int localX, int localY, int localZ);
+	void setSkyLight(ISavedChunk<?> chunk, int lightLevel, int localX, int localY, int localZ);
 	
 	int getSaveFileConstant();
 }

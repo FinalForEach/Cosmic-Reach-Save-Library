@@ -5,13 +5,21 @@ import finalforeach.cosmicreach.savelib.SaveFileConstants;
 
 public class SkylightSingleData implements ISkylightData 
 {
-	ISavedChunk<?> chunk;
-	public byte lightValue;
-	public SkylightSingleData(ISavedChunk<?> chunk, byte lightValue) 
+	public static SkylightSingleData[] allSingleValues = new SkylightSingleData[16];
+	static 
 	{
-		this.chunk = chunk;
+		for(byte i = 0; i < allSingleValues.length; i++) 
+		{
+			allSingleValues[i] = new SkylightSingleData(i);
+		}
+	}
+	
+	public byte lightValue;
+	private SkylightSingleData(byte lightValue) 
+	{
 		this.lightValue = lightValue;
 	}
+	
 	@Override
 	public int getSkyLight(int localX, int localY, int localZ) 
 	{
@@ -19,7 +27,7 @@ public class SkylightSingleData implements ISkylightData
 	}
 
 	@Override
-	public void setSkyLight(int lightLevel, int localX, int localY, int localZ) 
+	public void setSkyLight(ISavedChunk<?> chunk, int lightLevel, int localX, int localY, int localZ) 
 	{
 		if(lightLevel==lightValue) 
 		{
@@ -33,6 +41,15 @@ public class SkylightSingleData implements ISkylightData
 	public int getSaveFileConstant() 
 	{
 		return SaveFileConstants.SKYLIGHTDATA_SINGLE;
+	}
+	
+	public static ISkylightData getForLightValue(byte skylightValue) 
+	{
+		if(skylightValue < 0 || skylightValue > 15) 
+		{
+			throw new RuntimeException("Sky light values are only valid from 0-15, but got: " + skylightValue);
+		}
+		return allSingleValues[skylightValue];
 	}
 
 }
