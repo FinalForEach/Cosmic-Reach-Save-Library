@@ -56,14 +56,10 @@ public class BlockNibbleLayer<T> implements IBlockLayer<T>
 		final int idx = (localX + (localZ * CHUNK_WIDTH)) / 2;
 
 		final int b = blockIDs[idx];
-		int blockID;
-		if(localX % 2 == 0) 
-		{
-			blockID = b & 0x0F;	
-		}else 
-		{
-			blockID = (b & 0xF0) >> 4;
-		}
+		
+		int mod2 = localX % 2;
+		int blockID = (mod2 * ((b & 0xF0) >> 4)) + ((1 - mod2) * b & 0x0F);
+
 		return blockID;
 	}
 

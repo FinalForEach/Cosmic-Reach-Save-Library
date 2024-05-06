@@ -15,15 +15,23 @@ public class LayeredBlockData<T> implements IBlockData<T>
 	@SuppressWarnings("unchecked")
 	private IBlockLayer<T>[] layers = new IBlockLayer[CHUNK_WIDTH];
 
-	@SuppressWarnings("unchecked")
-	private T[] blockStatePalette = (T[])new Object[8];
+	private T[] blockStatePalette;
 	private int paletteSize = 0;
 
 	private boolean allowCleaning = true;
 
-	public LayeredBlockData() {}
+	@SuppressWarnings("unchecked")
+	public LayeredBlockData(int defaultPaletteSize)
+	{
+		blockStatePalette = (T[])new Object[defaultPaletteSize];
+	}
+	public LayeredBlockData() 
+	{
+		this(8);
+	}
 	public LayeredBlockData(T defaultBlockState)
 	{
+		this(8);
 		addToPalette(defaultBlockState);
 		for(int j = 0; j < CHUNK_WIDTH; j++) 
 		{
