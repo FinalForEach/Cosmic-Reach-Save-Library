@@ -1,5 +1,6 @@
 package finalforeach.cosmicreach.savelib.lightdata.skylight.layers;
 
+import finalforeach.cosmicreach.savelib.IChunkByteWriter;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.lightdata.skylight.SkylightLayeredData;
 
@@ -50,6 +51,10 @@ public class SkylightDataSingleLayer implements ISkylightDataLayer
 			throw new RuntimeException("Sky light values are only valid from 0-15, but got: " + skylightValue);
 		}
 		return allSingleLayerValues[skylightValue];
+	}
+
+	public void writeTo(IChunkByteWriter allChunksWriter) {
+		allChunksWriter.writeByte(lightLevel);
 	}
 
 }

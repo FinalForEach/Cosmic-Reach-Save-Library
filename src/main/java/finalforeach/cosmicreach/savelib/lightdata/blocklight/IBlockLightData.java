@@ -1,11 +1,14 @@
 package finalforeach.cosmicreach.savelib.lightdata.blocklight;
 
-public interface IBlockLightData {
+import finalforeach.cosmicreach.savelib.IChunkByteWriter;
+import finalforeach.cosmicreach.savelib.ISaveFileConstant;
 
+public interface IBlockLightData extends ISaveFileConstant
+{
 	short getBlockLight(int localX, int localY, int localZ);
 
 	void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int localX, int localY, int localZ);
 
-	int getSaveFileConstant();
+	void writeTo(IChunkByteWriter allChunksWriter);
 
 }

@@ -1,7 +1,10 @@
 package finalforeach.cosmicreach.savelib.blockdata;
 
+import java.io.IOException;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
+import finalforeach.cosmicreach.savelib.IChunkByteReader;
 import finalforeach.cosmicreach.savelib.IChunkByteWriter;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
 
@@ -92,10 +95,17 @@ public class SingleBlockData<T> implements IBlockData<T>
 	{
 		return SaveFileConstants.BLOCK_SINGLE;
 	}
+	
 	@Override
 	public void writeTo(IChunkByteWriter allChunksWriter) 
 	{
 		allChunksWriter.writeBlockValue(blockValue);
+	}
+	
+	public static <T> IBlockData<T> readFrom(IChunkByteReader reader, Function<String, T> saveKeyToBlockValue) throws IOException 
+	{
+		String blockStateSaveKey = reader.readString();
+		return new SingleBlockData<T>(saveKeyToBlockValue.apply(blockStateSaveKey));
 	}
 
 }

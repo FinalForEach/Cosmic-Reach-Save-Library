@@ -1,5 +1,6 @@
 package finalforeach.cosmicreach.savelib.lightdata.skylight.layers;
 
+import finalforeach.cosmicreach.savelib.IChunkByteWriter;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.lightdata.skylight.SkylightLayeredData;
 
@@ -55,6 +56,11 @@ public class SkylightDataNibbleLayer implements ISkylightDataLayer
 	public int getSaveFileConstant() 
 	{
 		return SaveFileConstants.SKYLIGHTDATA_LAYER_NIBBLE;
+	}
+
+	public void writeTo(IChunkByteWriter allChunksWriter) 
+	{
+		allChunksWriter.writeBytes(getBytes());
 	}
 
 }

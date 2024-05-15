@@ -1,5 +1,7 @@
 package finalforeach.cosmicreach.savelib.lightdata.blocklight.layers;
 
+import finalforeach.cosmicreach.savelib.IChunkByteWriter;
+import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.lightdata.blocklight.BlockLightLayeredData;
 
 public class BlockLightDataSingleLayer implements IBlockLightDataLayer
@@ -30,6 +32,19 @@ public class BlockLightDataSingleLayer implements IBlockLightDataLayer
 			shortLayer.setBlockLight(lightLevelRed, lightLevelGreen,lightLevelBlue, localX, localZ);
 			lightData.setLayer(yLevel, shortLayer);
 		}
+	}
+
+	@Override
+	public int getSaveFileConstant() 
+	{
+		return SaveFileConstants.BLOCKLIGHTDATA_LAYER_SINGLE;
+	}
+
+	@Override
+	public void writeTo(IChunkByteWriter allChunksWriter) {
+		allChunksWriter.writeByte(lightLevel >> 8);
+		allChunksWriter.writeByte(lightLevel >> 4);
+		allChunksWriter.writeByte(lightLevel);
 	}
 
 }

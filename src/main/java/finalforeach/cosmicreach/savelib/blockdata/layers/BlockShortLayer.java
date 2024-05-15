@@ -1,8 +1,8 @@
 package finalforeach.cosmicreach.savelib.blockdata.layers;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
+import finalforeach.cosmicreach.savelib.IChunkByteReader;
 import finalforeach.cosmicreach.savelib.IChunkByteWriter;
 import finalforeach.cosmicreach.savelib.ISavedChunk;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
@@ -84,22 +84,21 @@ public class BlockShortLayer<T> implements IBlockLayer<T>
 	{
 		return SaveFileConstants.BLOCK_LAYER_SHORT;
 	}
-
-	// TODO: Have more generic readFrom method
-	public static <T> BlockShortLayer<T> fromRandomAccessFileShortArray(RandomAccessFile raf) throws IOException 
-	{
-		BlockShortLayer<T> layer = new BlockShortLayer<T>(new short[NUM_BLOCKS_IN_LAYER]);
-		int l = layer.blockIDs.length;
-		for(int i = 0; i < l; i++) 
-		{
-			layer.blockIDs[i] = raf.readShort(); 
-		}
-		return layer;
-	}
 	
 	@Override
 	public void writeTo(LayeredBlockData<T> chunkData, IChunkByteWriter allChunksWriter) 
 	{
 		allChunksWriter.writeShorts(blockIDs);
+	}
+
+	public static <T> BlockShortLayer<T> readFrom(IChunkByteReader reader) throws IOException 
+	{
+		BlockShortLayer<T> layer = new BlockShortLayer<T>(new short[NUM_BLOCKS_IN_LAYER]);
+		int l = layer.blockIDs.length;
+		for(int i = 0; i < l; i++) 
+		{
+			layer.blockIDs[i] = reader.readShort();
+		}
+		return layer;
 	}
 }

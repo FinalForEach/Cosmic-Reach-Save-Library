@@ -1,11 +1,18 @@
 package finalforeach.cosmicreach.savelib.blockdata;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
+import finalforeach.cosmicreach.savelib.IChunkByteReader;
 import finalforeach.cosmicreach.savelib.IChunkByteWriter;
 import finalforeach.cosmicreach.savelib.ISavedChunk;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
+import finalforeach.cosmicreach.savelib.blockdata.layers.BlockByteLayer;
+import finalforeach.cosmicreach.savelib.blockdata.layers.BlockHalfNibbleLayer;
+import finalforeach.cosmicreach.savelib.blockdata.layers.BlockNibbleLayer;
+import finalforeach.cosmicreach.savelib.blockdata.layers.BlockShortLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockSingleLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.IBlockLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.SharedBlockSingleLayer;
@@ -230,5 +237,72 @@ public class LayeredBlockData<T> implements IBlockData<T>
 		{
 			throw new RuntimeException("Failed to clean palette: This should never happen.");
 		}
+	}
+	
+	public static <T> IBlockData<T> readFrom(IChunkByteReader reader, Function<String, T> saveKeyToBlockValue) throws IOException 
+	{
+		int paletteSize = reader.readInt();
+		final var chunkData = new LayeredBlockData<T>(paletteSize);
+		
+		for(int i = 0; i < paletteSize; i++) 
+		{
+			String blockStateSaveKey = reader.readString();
+			chunkData.addToPalette(saveKeyToBlockValue.apply(blockStateSaveKey));
+		}
+		for(int l = 0; l < CHUNK_WIDTH; l++) 
+		{
+			int layerType = reader.readByte();
+			
+			switch(layerType) 
+			{
+			case SaveFileConstants.BLOCK_LAYER_SINGLE_BYTE:
+			{
+				int blockId = reader.readByte();
+				var layer = SharedBlockSingleLayer.get(chunkData, chunkData.getBlockValueFromPaletteId(blockId));
+				chunkData.setLayer(l, layer);
+				break;
+			}
+			case SaveFileConstants.BLOCK_LAYER_SINGLE_INT:
+			{
+				int blockId = reader.readByte();
+				var layer = SharedBlockSingleLayer.get(chunkData, chunkData.getBlockValueFromPaletteId(blockId));
+				chunkData.setLayer(l, layer);
+				break;
+			}
+			case SaveFileConstants.BLOCK_LAYER_HALFNIBBLE:
+			{
+				byte[] bytes = new byte[CHUNK_WIDTH * CHUNK_WIDTH / 4];
+				reader.readFully(bytes);
+				var layer = new BlockHalfNibbleLayer<T>(bytes);
+				chunkData.setLayer(l, layer);
+				break;
+			}
+			case SaveFileConstants.BLOCK_LAYER_NIBBLE:
+			{
+				byte[] bytes = new byte[CHUNK_WIDTH * CHUNK_WIDTH / 2];
+				reader.readFully(bytes);
+				var layer = new BlockNibbleLayer<T>(bytes);
+				chunkData.setLayer(l, layer);
+				break;
+			}
+			case SaveFileConstants.BLOCK_LAYER_BYTE:
+			{
+				byte[] bytes = new byte[CHUNK_WIDTH * CHUNK_WIDTH];
+				reader.readFully(bytes);
+				var layer = new BlockByteLayer<T>(bytes);
+				chunkData.setLayer(l, layer);
+				break;
+			}
+			case SaveFileConstants.BLOCK_LAYER_SHORT:
+			{
+				BlockShortLayer<T> layer = BlockShortLayer.readFrom(reader);
+				chunkData.setLayer(l, layer);
+				break;
+			}
+			default:
+				throw new RuntimeException("Unknown layerType: " + layerType);
+			}
+		}
+		return chunkData;
 	}
 }

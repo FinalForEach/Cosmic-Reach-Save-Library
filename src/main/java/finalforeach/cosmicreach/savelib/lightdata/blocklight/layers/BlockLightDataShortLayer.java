@@ -1,7 +1,10 @@
 package finalforeach.cosmicreach.savelib.lightdata.blocklight.layers;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
+
+import finalforeach.cosmicreach.savelib.IChunkByteReader;
+import finalforeach.cosmicreach.savelib.IChunkByteWriter;
+import finalforeach.cosmicreach.savelib.SaveFileConstants;
 
 public class BlockLightDataShortLayer implements IBlockLightDataLayer
 {
@@ -13,17 +16,6 @@ public class BlockLightDataShortLayer implements IBlockLightDataLayer
 		{
 			lightLevels[i] = lightLevel;
 		}
-	}
-	
-	public static BlockLightDataShortLayer fromRandomAccessFileShortArray(RandomAccessFile raf) throws IOException 
-	{
-		BlockLightDataShortLayer layer = new BlockLightDataShortLayer();
-		int l = layer.lightLevels.length;
-		for(int i = 0; i < l; i++) 
-		{
-			layer.lightLevels[i] = raf.readShort(); 
-		}
-		return layer;
 	}
 	
 	public BlockLightDataShortLayer() 
@@ -47,4 +39,26 @@ public class BlockLightDataShortLayer implements IBlockLightDataLayer
 		return lightLevels;
 	}
 
+	@Override
+	public int getSaveFileConstant() 
+	{
+		return SaveFileConstants.BLOCKLIGHTDATA_LAYER_SHORT;
+	}
+
+	@Override
+	public void writeTo(IChunkByteWriter allChunksWriter) 
+	{
+		allChunksWriter.writeShorts(getShorts());
+	}
+
+	public static BlockLightDataShortLayer readFrom(IChunkByteReader reader) throws IOException 
+	{
+		BlockLightDataShortLayer layer = new BlockLightDataShortLayer();
+		int l = layer.lightLevels.length;
+		for(int i = 0; i < l; i++) 
+		{
+			layer.lightLevels[i] = reader.readShort(); 
+		}
+		return layer;
+	}
 }

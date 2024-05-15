@@ -3,9 +3,10 @@ package finalforeach.cosmicreach.savelib.blockdata;
 import java.util.function.Predicate;
 
 import finalforeach.cosmicreach.savelib.IChunkByteWriter;
+import finalforeach.cosmicreach.savelib.ISaveFileConstant;
 import finalforeach.cosmicreach.savelib.ISavedChunk;
 
-public interface IBlockData<T>
+public interface IBlockData<T> extends ISaveFileConstant
 {
 	public static final int CHUNK_WIDTH = ISavedChunk.CHUNK_WIDTH;
 	public T getBlockValue(int localX, int localY, int localZ);
@@ -21,6 +22,5 @@ public interface IBlockData<T>
 	boolean isEntirely(T blockValue);
 	boolean isEntirely(Predicate<T> predicate);
 	public int getUniqueBlockValuesCount();
-	public int getSaveFileConstant();
 	public void writeTo(IChunkByteWriter allChunksWriter);
 }

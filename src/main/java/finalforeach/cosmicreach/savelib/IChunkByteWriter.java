@@ -1,7 +1,7 @@
 package finalforeach.cosmicreach.savelib;
 
-public interface IChunkByteWriter {
-
+public interface IChunkByteWriter
+{
 	<T> void writeBlockValue(T blockValue);
 
 	void writeInt(int i);
@@ -11,5 +11,4 @@ public interface IChunkByteWriter {
 	void writeBytes(byte[] bytes);
 
 	void writeShorts(short[] shorts);
-
 }

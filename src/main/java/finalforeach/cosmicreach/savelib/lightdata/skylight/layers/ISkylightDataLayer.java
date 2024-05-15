@@ -1,9 +1,11 @@
 package finalforeach.cosmicreach.savelib.lightdata.skylight.layers;
 
+import finalforeach.cosmicreach.savelib.IChunkByteWriter;
+import finalforeach.cosmicreach.savelib.ISaveFileConstant;
 import finalforeach.cosmicreach.savelib.ISavedChunk;
 import finalforeach.cosmicreach.savelib.lightdata.skylight.SkylightLayeredData;
 
-public interface ISkylightDataLayer
+public interface ISkylightDataLayer extends ISaveFileConstant
 {
 	static final int CHUNK_WIDTH = ISavedChunk.CHUNK_WIDTH;
 
@@ -11,6 +13,6 @@ public interface ISkylightDataLayer
 
 	int getSkyLight(int localX, int localZ);
 
-	int getSaveFileConstant();
+	void writeTo(IChunkByteWriter allChunksWriter);
 
 }

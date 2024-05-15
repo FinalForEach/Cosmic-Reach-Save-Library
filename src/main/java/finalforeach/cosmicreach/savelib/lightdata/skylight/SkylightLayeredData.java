@@ -1,5 +1,6 @@
 package finalforeach.cosmicreach.savelib.lightdata.skylight;
 
+import finalforeach.cosmicreach.savelib.IChunkByteWriter;
 import finalforeach.cosmicreach.savelib.ISavedChunk;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.lightdata.skylight.layers.ISkylightDataLayer;
@@ -49,5 +50,14 @@ public class SkylightLayeredData implements ISkylightData
 	public int getSaveFileConstant() 
 	{
 		return SaveFileConstants.SKYLIGHTDATA_LAYERED;
+	}
+	@Override
+	public void writeTo(IChunkByteWriter allChunksWriter)
+	{
+		for(var layer : getLayers()) 
+		{
+			allChunksWriter.writeByte(layer.getSaveFileConstant());
+			layer.writeTo(allChunksWriter);
+		}		
 	}
 }
