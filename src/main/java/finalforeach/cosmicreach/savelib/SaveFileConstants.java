@@ -4,7 +4,7 @@ public class SaveFileConstants
 {
 	// [F]inal[F]or[E]ach [C]osmi[c]r[eac]h
 	public static final int MAGIC = 0xFFECCEAC;
-	public static final int FILE_VERSION = 0;	
+	public static final int FILE_VERSION = 1;	
 	public static final int COMPRESSION_TYPE_NONE = 0;
 
 	public static final int BLOCK_NULL = 0;
@@ -30,4 +30,7 @@ public class SaveFileConstants
 
 	public static final int BLOCKLIGHTDATA_LAYER_SINGLE = 1;
 	public static final int BLOCKLIGHTDATA_LAYER_SHORT = 2;
+	
+	public static final int BLOCKENTITY_NULL = 0;
+	public static final int BLOCKENTITY_DATA = 1;
 }
