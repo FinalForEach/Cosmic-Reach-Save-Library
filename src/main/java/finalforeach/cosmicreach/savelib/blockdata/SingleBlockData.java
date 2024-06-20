@@ -107,5 +107,11 @@ public class SingleBlockData<T> implements IBlockData<T>
 		String blockStateSaveKey = reader.readString();
 		return new SingleBlockData<T>(saveKeyToBlockValue.apply(blockStateSaveKey));
 	}
+	
+	@Override
+	public boolean hasValueInPalette(T value) 
+	{
+		return this.blockValue == value;
+	}
 
 }

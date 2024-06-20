@@ -106,6 +106,19 @@ public class LayeredBlockData<T> implements IBlockData<T>
 
 		return true;
 	}
+	
+	@Override
+	public boolean hasValueInPalette(T value) 
+	{
+		var palette = blockStatePalette;
+		final int paletteSize = getPaletteSize();
+		for(int i = 0; i < paletteSize; i++) 
+		{
+			T b = palette[i];
+			if(b == value)return true;
+		}
+		return false;
+	}
 
 	@Override
 	public boolean isEntirely(T blockValue) 

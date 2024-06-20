@@ -23,4 +23,5 @@ public interface IBlockData<T> extends ISaveFileConstant
 	boolean isEntirely(Predicate<T> predicate);
 	public int getUniqueBlockValuesCount();
 	public void writeTo(IChunkByteWriter allChunksWriter);
+	public boolean hasValueInPalette(T value);
 }
