@@ -18,7 +18,7 @@ public class CosmicReachBinarySchema
 		{
 			return;
 		}
-		
+
 		for(int i = 0; i < schema.size(); i++)
 		{
 			var s = schema.get(i);
@@ -30,7 +30,7 @@ public class CosmicReachBinarySchema
 		var item = new SchemaItem(name, type);
 		schema.add(item);		
 	}
-	
+
 	public Iterable<SchemaItem> getSchema()
 	{
 		return schema;
@@ -50,7 +50,7 @@ public class CosmicReachBinarySchema
 			}
 		}
 		byteCount++; // For schema end
-		
+
 		byte[] bytes = new byte[byteCount];
 		int byteIdx = 0;
 		for(var item : schema)
@@ -58,12 +58,12 @@ public class CosmicReachBinarySchema
 			byteIdx = RawByteArrayUtils.writeByte(byteIdx, bytes, item.type.byteId);
 			byteIdx = RawByteArrayUtils.writeString(byteIdx, bytes, item.name);	
 		}
-		
+
 		byteIdx = RawByteArrayUtils.writeByte(byteIdx, bytes, SchemaType.SCHEMA_END.byteId);
-				
+
 		return bytes;
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
