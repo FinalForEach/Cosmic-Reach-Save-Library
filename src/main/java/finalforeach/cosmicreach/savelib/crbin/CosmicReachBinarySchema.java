@@ -1,7 +1,9 @@
 package finalforeach.cosmicreach.savelib.crbin;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
+import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.utils.DynamicArrays;
 import finalforeach.cosmicreach.savelib.utils.IDynamicArray;
 import finalforeach.cosmicreach.savelib.utils.RawByteArrayUtils;
@@ -46,7 +48,7 @@ public class CosmicReachBinarySchema
 			byteCount+=Integer.BYTES; // For the string length or null specifier
 			if(item.name!=null) 
 			{
-				byteCount+=item.name.getBytes().length; // the string's bytes
+				byteCount+=item.name.getBytes(StandardCharsets.UTF_8).length; // the string's bytes
 			}
 		}
 		byteCount++; // For schema end

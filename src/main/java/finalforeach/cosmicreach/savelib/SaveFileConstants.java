@@ -1,5 +1,6 @@
 package finalforeach.cosmicreach.savelib;
 
+
 public class SaveFileConstants 
 {
 	// [F]inal[F]or[E]ach [C]osmi[c]r[eac]h

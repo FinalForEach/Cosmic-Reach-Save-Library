@@ -1,5 +1,7 @@
 package finalforeach.cosmicreach.savelib.utils;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * Utility methods to write to a raw byte array as required by the cosmic reach binary serialization format.
  * */
@@ -29,7 +31,7 @@ public class RawByteArrayUtils
 			return writeInt(offset, byteArr, -1);
 		}
 		
-		byte[] strBytes = str.getBytes();
+		byte[] strBytes = str.getBytes(StandardCharsets.UTF_8);
 		offset = writeInt(offset, byteArr, strBytes.length);
 		
 		System.arraycopy(strBytes, 0, byteArr, offset, strBytes.length);
