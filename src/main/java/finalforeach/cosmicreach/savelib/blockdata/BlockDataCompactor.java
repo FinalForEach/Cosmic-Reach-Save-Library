@@ -47,6 +47,11 @@ public class BlockDataCompactor
 				}
 			}
 			
+			if(layered.getPaletteSize()!=1) 
+			{
+				layered.cleanPalette();
+			}
+			
 			// If only one block in palette, no need for layers
 			if(layered.getPaletteSize()==1) 
 			{

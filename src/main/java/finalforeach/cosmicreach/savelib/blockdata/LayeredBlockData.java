@@ -215,37 +215,41 @@ public class LayeredBlockData<T> implements IBlockData<T>
 	}
 	public void cleanPalette() 
 	{
-		if(!allowCleaning) 
+		int currentPaletteSize = getPaletteSize();
+		if(!allowCleaning || currentPaletteSize == 1) 
 		{
 			// Prevents possible infinite recursions
+			// and early exits if there's only a single palette value
 			return;
 		}
 		
-		int currentPaletteSize = getPaletteSize();
 		
 		LayeredBlockData<T> tempBlockData = new LayeredBlockData<>(getBlockValue(0, 0, 0));
 		tempBlockData.allowCleaning  = false;
-		for(int i = 0; i < CHUNK_WIDTH; i++) 
+		
+		for(int j = 0; j < CHUNK_WIDTH; j++) 
 		{
-			for(int j = 0; j < CHUNK_WIDTH; j++) 
+			var layer = getLayer(j);
+			if(layer instanceof SharedBlockSingleLayer<T>) 
 			{
-				for(int k = 0; k < CHUNK_WIDTH; k++) 
+				tempBlockData.setLayer(j, layer);
+			}else 
+			{		
+				for(int i = 0; i < CHUNK_WIDTH; i++) 
 				{
-					var curBlockValue = getBlockValue(i, j, k);
-					tempBlockData.setBlockValue(curBlockValue, i, j, k);
+					for(int k = 0; k < CHUNK_WIDTH; k++) 
+					{
+						var curBlockValue = getBlockValue(i, j, k);
+						tempBlockData.setBlockValue(curBlockValue, i, j, k);
+					}
 				}
 			}
-		}
+		}		
 		
 		paletteSize = tempBlockData.paletteSize;
 		blockStatePalette = tempBlockData.blockStatePalette;
 		layers = tempBlockData.layers;
 		
-		int numRemoved = currentPaletteSize - tempBlockData.paletteSize;
-		
-		
-		
-		System.out.println("Cleaned up " + numRemoved + " blockstates from palette.");
 		if(getPaletteSize() > ISavedChunk.NUM_BLOCKS_IN_CHUNK) 
 		{
 			throw new RuntimeException("Failed to clean palette: This should never happen.");
