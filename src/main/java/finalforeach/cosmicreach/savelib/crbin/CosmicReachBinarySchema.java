@@ -3,7 +3,6 @@ package finalforeach.cosmicreach.savelib.crbin;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.utils.DynamicArrays;
 import finalforeach.cosmicreach.savelib.utils.IDynamicArray;
 import finalforeach.cosmicreach.savelib.utils.RawByteArrayUtils;
@@ -57,10 +56,14 @@ public class CosmicReachBinarySchema
 		int byteIdx = 0;
 		for(var item : schema)
 		{
+			// Write the schema item type byte
 			byteIdx = RawByteArrayUtils.writeByte(byteIdx, bytes, item.type.byteId);
+			
+			// Write the name of the schema item
 			byteIdx = RawByteArrayUtils.writeString(byteIdx, bytes, item.name);	
 		}
 
+		// Write the ending byte, the schema is done after this!
 		byteIdx = RawByteArrayUtils.writeByte(byteIdx, bytes, SchemaType.SCHEMA_END.byteId);
 
 		return bytes;
