@@ -1,7 +1,7 @@
 package finalforeach.cosmicreach.savelib.utils;
 
-@FunctionalInterface
 public interface IDynamicArrayInstantiator
 {
-	<E> IDynamicArray<E> create();
+	<E> IDynamicArray<E> create(Class<E> clazz);
+	<E> IDynamicArray<E> create(Class<E> clazz, int initialCapacity);
 }

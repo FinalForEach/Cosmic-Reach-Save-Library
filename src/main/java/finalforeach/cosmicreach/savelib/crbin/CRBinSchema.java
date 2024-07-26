@@ -7,11 +7,11 @@ import finalforeach.cosmicreach.savelib.utils.DynamicArrays;
 import finalforeach.cosmicreach.savelib.utils.IDynamicArray;
 import finalforeach.cosmicreach.savelib.utils.RawByteArrayUtils;
 
-public class CosmicReachBinarySchema
+public class CRBinSchema
 {
 	public record SchemaItem(String name, SchemaType type) {}
 
-	private IDynamicArray<SchemaItem> schema = DynamicArrays.newDynamicArray();
+	private IDynamicArray<SchemaItem> schema = DynamicArrays.getNew(SchemaItem.class);
 
 	public void add(String name, SchemaType type)
 	{
@@ -82,7 +82,7 @@ public class CosmicReachBinarySchema
 			return true;
 		if ((obj == null) || (getClass() != obj.getClass()))
 			return false;
-		CosmicReachBinarySchema other = (CosmicReachBinarySchema) obj;
+		CRBinSchema other = (CRBinSchema) obj;
 		return Objects.equals(schema, other.schema);
 	}
 }
