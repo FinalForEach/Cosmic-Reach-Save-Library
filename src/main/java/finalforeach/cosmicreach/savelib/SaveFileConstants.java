@@ -32,6 +32,10 @@ public class SaveFileConstants
 	public static final int BLOCKLIGHTDATA_LAYER_SINGLE = 1;
 	public static final int BLOCKLIGHTDATA_LAYER_SHORT = 2;
 	
+	public static final int BLOCKLIGHTDATA_LAYER_MONO_NIBBLE_RED = 3;
+	public static final int BLOCKLIGHTDATA_LAYER_MONO_NIBBLE_GREEN = 4;
+	public static final int BLOCKLIGHTDATA_LAYER_MONO_NIBBLE_BLUE = 5;
+	
 	public static final int BLOCKENTITY_NULL = 0;
 	public static final int BLOCKENTITY_DATA = 1;
 	

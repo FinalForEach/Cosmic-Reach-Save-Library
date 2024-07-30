@@ -6,6 +6,8 @@ import finalforeach.cosmicreach.savelib.blockdata.layers.SharedBlockSingleLayer;
 
 public class BlockDataCompactor 
 {
+	public static final int CHUNK_WIDTH = ISavedChunk.CHUNK_WIDTH;
+	
 	public static <T> IBlockData<T> compact(IBlockData<T> blockData) 
 	{
 		if(blockData instanceof LayeredBlockData<T> layered) 
@@ -21,9 +23,9 @@ public class BlockDataCompactor
 				
 				T layerBlockState = null;
 				singleBlockCheck:
-				for(int i = 0; i < ISavedChunk.CHUNK_WIDTH; i++) 
+				for(int i = 0; i < CHUNK_WIDTH; i++) 
 				{
-					for(int k = 0; k < ISavedChunk.CHUNK_WIDTH; k++) 
+					for(int k = 0; k < CHUNK_WIDTH; k++) 
 					{
 						T curBlockState = layer.getBlockValue(layered, i, k);
 						if(layerBlockState==null) 

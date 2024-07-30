@@ -52,7 +52,8 @@ public class BlockNibbleLayer<T> implements IBlockLayer<T>
 	}
 	
 	@Override
-	public int getBlockValueID(LayeredBlockData<T> chunkData, int localX, int localZ) {
+	public int getBlockValueID(LayeredBlockData<T> chunkData, int localX, int localZ)
+	{
 		final int idx = (localX + (localZ * CHUNK_WIDTH)) / 2;
 
 		final int b = blockIDs[idx];
@@ -67,7 +68,7 @@ public class BlockNibbleLayer<T> implements IBlockLayer<T>
 	public void setBlockValue(LayeredBlockData<T> chunkData, T blockValue, int localX, int localY, int localZ) 
 	{
 		int paletteID = chunkData.getBlockValueID(blockValue);
-		if(paletteID==-1) 
+		if(paletteID == -1) 
 		{
 			paletteID = chunkData.getPaletteSize();
 			chunkData.addToPalette(blockValue);

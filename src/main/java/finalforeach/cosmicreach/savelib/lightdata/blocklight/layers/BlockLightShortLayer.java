@@ -6,11 +6,11 @@ import finalforeach.cosmicreach.savelib.IChunkByteReader;
 import finalforeach.cosmicreach.savelib.IChunkByteWriter;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
 
-public class BlockLightDataShortLayer implements IBlockLightDataLayer
+public class BlockLightShortLayer implements IBlockLightLayer
 {
 	private short[] lightLevels = new short[CHUNK_WIDTH * CHUNK_WIDTH];	
 
-	public BlockLightDataShortLayer(short lightLevel) 
+	public BlockLightShortLayer(short lightLevel) 
 	{
 		for(int i = 0; i < lightLevels.length; i++) 
 		{
@@ -18,7 +18,7 @@ public class BlockLightDataShortLayer implements IBlockLightDataLayer
 		}
 	}
 	
-	public BlockLightDataShortLayer() 
+	public BlockLightShortLayer() 
 	{
 	}
 
@@ -51,9 +51,9 @@ public class BlockLightDataShortLayer implements IBlockLightDataLayer
 		allChunksWriter.writeShorts(getShorts());
 	}
 
-	public static BlockLightDataShortLayer readFrom(IChunkByteReader reader) throws IOException 
+	public static BlockLightShortLayer readFrom(IChunkByteReader reader) throws IOException 
 	{
-		BlockLightDataShortLayer layer = new BlockLightDataShortLayer();
+		BlockLightShortLayer layer = new BlockLightShortLayer();
 		int l = layer.lightLevels.length;
 		for(int i = 0; i < l; i++) 
 		{
