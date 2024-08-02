@@ -73,6 +73,7 @@ public class LightDataCompactor
 
 	public static IBlockLightData compactBlockLights(IBlockLightData blockLightData)
 	{
+		if(1==1)return blockLightData;
 		if(blockLightData instanceof BlockLightLayeredData layered) 
 		{
 			var layers = layered.getLayers();

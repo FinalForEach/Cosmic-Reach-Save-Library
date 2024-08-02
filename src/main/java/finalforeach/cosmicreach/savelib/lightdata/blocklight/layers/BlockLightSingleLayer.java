@@ -36,8 +36,8 @@ public class BlockLightSingleLayer implements IBlockLightLayer
 			IBlockLightLayer lightLayer = null;
 			if(oldR!=lightLevelRed && oldG == lightLevelGreen && oldB == lightLevelBlue) 
 			{
-				lightLayer = new BlockLightMonoRedNibbleLayer(lightData, yLevel, lightLevel);
-				lightLayer.setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, localX, localZ);
+				//lightLayer = new BlockLightMonoRedNibbleLayer(lightData, yLevel, lightLevel);
+				//lightLayer.setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, localX, localZ);
 			}
 
 			if(lightLayer == null)
