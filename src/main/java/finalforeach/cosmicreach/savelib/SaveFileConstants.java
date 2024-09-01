@@ -18,6 +18,7 @@ public class SaveFileConstants
 	public static final int BLOCK_LAYER_NIBBLE = 4;
 	public static final int BLOCK_LAYER_BYTE = 5;
 	public static final int BLOCK_LAYER_SHORT = 6;
+	public static final int BLOCK_LAYER_BIT = 7;
 	
 	public static final int SKYLIGHTDATA_NULL = 1;
 	public static final int SKYLIGHTDATA_LAYERED = 2;

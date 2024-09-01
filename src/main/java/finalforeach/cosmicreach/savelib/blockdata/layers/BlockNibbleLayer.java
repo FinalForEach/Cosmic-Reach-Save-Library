@@ -33,14 +33,14 @@ public class BlockNibbleLayer<T> implements IBlockLayer<T>
 		return blockIDs;
 	}
 
-	public BlockNibbleLayer(LayeredBlockData<T> chunkData, int localY, BlockHalfNibbleLayer<T> halfNibbleLayer) 
+	public BlockNibbleLayer(LayeredBlockData<T> chunkData, int localY, IBlockLayer<T> srcLayer) 
 	{
 		this.blockIDs = new byte[CHUNK_WIDTH * CHUNK_WIDTH / 2];
 		for(int i = 0; i < CHUNK_WIDTH; i++) 
 		{
 			for(int k = 0; k < CHUNK_WIDTH; k++) 
 			{
-				setBlockValue(chunkData, halfNibbleLayer.getBlockValue(chunkData, i, k), i, localY, k);
+				setBlockValue(chunkData, srcLayer.getBlockValue(chunkData, i, k), i, localY, k);
 			}
 		}
 	}

@@ -9,6 +9,7 @@ import finalforeach.cosmicreach.savelib.IChunkByteReader;
 import finalforeach.cosmicreach.savelib.IChunkByteWriter;
 import finalforeach.cosmicreach.savelib.ISavedChunk;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
+import finalforeach.cosmicreach.savelib.blockdata.layers.BlockBitLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockByteLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockHalfNibbleLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockNibbleLayer;
@@ -313,6 +314,14 @@ public class LayeredBlockData<T> implements IBlockData<T>
 			case SaveFileConstants.BLOCK_LAYER_SHORT:
 			{
 				BlockShortLayer<T> layer = BlockShortLayer.readFrom(reader);
+				chunkData.setLayer(l, layer);
+				break;
+			}
+			case SaveFileConstants.BLOCK_LAYER_BIT:
+			{
+				byte[] bytes = new byte[CHUNK_WIDTH * CHUNK_WIDTH / 8];
+				reader.readFully(bytes);
+				var layer = new BlockBitLayer<T>(bytes);
 				chunkData.setLayer(l, layer);
 				break;
 			}
