@@ -57,7 +57,7 @@ public class BlockBitLayer<T> implements IBlockLayer<T>
 	public void setBlockValue(LayeredBlockData<T> chunkData, T blockValue, int localX, int localY, int localZ) 
 	{
 		int paletteID = chunkData.getBlockValueID(blockValue);
-		if(paletteID==-1) 
+		if(paletteID == -1) 
 		{
 			paletteID = chunkData.getPaletteSize();
 			chunkData.addToPalette(blockValue);
@@ -71,7 +71,7 @@ public class BlockBitLayer<T> implements IBlockLayer<T>
 		}
 		
 		final T oldBlock = getBlockValue(chunkData, localX, localZ);
-		if(blockValue!=oldBlock) 
+		if(blockValue != oldBlock) 
 		{
 			final int idx = (localX + (localZ * CHUNK_WIDTH)) / 8;
 			final int b = blockIDs[idx];
@@ -79,14 +79,14 @@ public class BlockBitLayer<T> implements IBlockLayer<T>
 			int mod = localX % 8;
 			blockIDs[idx] = switch (mod) 
 			{
-				case 0 -> (byte) ((b & 0x01) | paletteID);
-				case 1 -> (byte) ((b & 0x02) | (paletteID << mod));
-				case 2 -> (byte) ((b & 0x04) | (paletteID << mod));
-				case 3 -> (byte) ((b & 0x08) | (paletteID << mod));
-				case 4 -> (byte) ((b & 0x10) | (paletteID << mod));
-				case 5 -> (byte) ((b & 0x20) | (paletteID << mod));
-				case 6 -> (byte) ((b & 0x40) | (paletteID << mod));
-				case 7 -> (byte) ((b & 0x80) | (paletteID << mod));
+				case 0 -> (byte) ((b & 0xFE) | paletteID);
+				case 1 -> (byte) ((b & 0xFD) | (paletteID << mod));
+				case 2 -> (byte) ((b & 0xFB) | (paletteID << mod));
+				case 3 -> (byte) ((b & 0xF7) | (paletteID << mod));
+				case 4 -> (byte) ((b & 0xEF) | (paletteID << mod));
+				case 5 -> (byte) ((b & 0xDF) | (paletteID << mod));
+				case 6 -> (byte) ((b & 0xBF) | (paletteID << mod));
+				case 7 -> (byte) ((b & 0x7F) | (paletteID << mod));
 				default -> throw new IllegalArgumentException("Unexpected value: " + mod);
 			};
 		}
@@ -99,7 +99,7 @@ public class BlockBitLayer<T> implements IBlockLayer<T>
 	@Override
 	public int getSaveFileConstant(LayeredBlockData<T> chunkData) 
 	{
-		return SaveFileConstants.BLOCK_LAYER_HALFNIBBLE;
+		return SaveFileConstants.BLOCK_LAYER_BIT;
 	}
 
 	@Override

@@ -124,7 +124,7 @@ public class LayeredBlockData<T> implements IBlockData<T>
 	@Override
 	public boolean isEntirely(T blockValue) 
 	{
-		return getPaletteSize()==1 && getBlockValueFromPaletteId(0) == blockValue;
+		return getPaletteSize() == 1 && getBlockValueFromPaletteId(0) == blockValue;
 	}
 	
 	@Override
