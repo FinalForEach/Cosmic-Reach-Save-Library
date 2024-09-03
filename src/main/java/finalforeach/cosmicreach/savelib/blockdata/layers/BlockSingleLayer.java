@@ -37,12 +37,13 @@ public class BlockSingleLayer<T> implements IBlockLayer<T>
 	@Override
 	public void setBlockValue(LayeredBlockData<T> chunkData, T blockState, int localX, int localY, int localZ) 
 	{
-		if(this.blockValue==blockState) 
+		if(this.blockValue == blockState) 
 		{
 			return;
 		}else 
 		{
 			final var layer = new BlockNibbleLayer<T>(chunkData, localY, this.blockValue);
+			//final var layer = new BlockBitLayer<T>(chunkData, localY, this.blockValue);
 			chunkData.setLayer(localY, layer);
 			layer.setBlockValue(chunkData, blockState, localX, localY, localZ);
 		}

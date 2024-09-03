@@ -13,6 +13,19 @@ public class BlockBitLayer<T> implements IBlockLayer<T>
 		this.blockIDs = bytes;
 	}
 	
+	public BlockBitLayer(LayeredBlockData<T> chunkData, int localY, IBlockLayer<T> srcLayer) 
+	{
+		this.blockIDs = new byte[CHUNK_WIDTH * CHUNK_WIDTH / 8];
+		for(int i = 0; i < CHUNK_WIDTH; i++) 
+		{
+			for(int k = 0; k < CHUNK_WIDTH; k++) 
+			{
+				var blockValue = srcLayer.getBlockValue(chunkData, i, k);
+				setBlockValue(chunkData, blockValue, i, localY, k);
+			}
+		}
+	}
+	
 	public BlockBitLayer(LayeredBlockData<T> chunkData, int localY, T blockState) 
 	{
 		this.blockIDs = new byte[CHUNK_WIDTH * CHUNK_WIDTH / 8];
@@ -64,7 +77,7 @@ public class BlockBitLayer<T> implements IBlockLayer<T>
 		}
 		if(paletteID > 1)
 		{
-			final var layer = new BlockHalfNibbleLayer<T>(chunkData, localY, this);
+			final var layer = new BlockNibbleLayer<T>(chunkData, localY, this);
 			layer.setBlockValue(chunkData, blockValue, localX, localY, localZ);
 			chunkData.setLayer(localY, layer);
 			return;

@@ -41,7 +41,7 @@ public class BlockDataCompactor
 					}
 				}
 				
-				if(layerBlockState!=null) 
+				if(layerBlockState != null) 
 				{
 					// Replace the layer with the compact equivalent!
 					var newLayer = SharedBlockSingleLayer.get(layered, layerBlockState);
@@ -49,13 +49,13 @@ public class BlockDataCompactor
 				}
 			}
 			
-			if(layered.getPaletteSize()!=1) 
+			if(layered.getPaletteSize() != 1) 
 			{
 				layered.cleanPalette();
 			}
-			
+
 			// If only one block in palette, no need for layers
-			if(layered.getPaletteSize()==1) 
+			if(layered.getPaletteSize() == 1) 
 			{
 				var newChunkData = new SingleBlockData<T>();
 				blockData = newChunkData.fill(layered.getBlockValueFromPaletteId(0));

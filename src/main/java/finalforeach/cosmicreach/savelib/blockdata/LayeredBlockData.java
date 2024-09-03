@@ -287,6 +287,14 @@ public class LayeredBlockData<T> implements IBlockData<T>
 				chunkData.setLayer(l, layer);
 				break;
 			}
+			case SaveFileConstants.BLOCK_LAYER_BIT:
+			{
+				byte[] bytes = new byte[CHUNK_WIDTH * CHUNK_WIDTH / 8];
+				reader.readFully(bytes);
+				var layer = new BlockBitLayer<T>(bytes);
+				chunkData.setLayer(l, layer);
+				break;
+			}
 			case SaveFileConstants.BLOCK_LAYER_HALFNIBBLE:
 			{
 				byte[] bytes = new byte[CHUNK_WIDTH * CHUNK_WIDTH / 4];
@@ -314,14 +322,6 @@ public class LayeredBlockData<T> implements IBlockData<T>
 			case SaveFileConstants.BLOCK_LAYER_SHORT:
 			{
 				BlockShortLayer<T> layer = BlockShortLayer.readFrom(reader);
-				chunkData.setLayer(l, layer);
-				break;
-			}
-			case SaveFileConstants.BLOCK_LAYER_BIT:
-			{
-				byte[] bytes = new byte[CHUNK_WIDTH * CHUNK_WIDTH / 8];
-				reader.readFully(bytes);
-				var layer = new BlockBitLayer<T>(bytes);
 				chunkData.setLayer(l, layer);
 				break;
 			}

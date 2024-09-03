@@ -31,7 +31,7 @@ public class SharedBlockSingleLayer<T> extends BlockSingleLayer<T>
 			{
 				// Check again, to prevent race conditions
 				shared = sharedInstances.get(blockValue);
-				if(shared==null) 
+				if(shared == null) 
 				{
 					shared = new SharedBlockSingleLayer<T>(chunkData, blockValue);
 					sharedInstances.put(blockValue, shared);
