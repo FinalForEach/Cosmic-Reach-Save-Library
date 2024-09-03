@@ -22,7 +22,6 @@ import finalforeach.cosmicreach.savelib.blockdata.layers.BlockByteLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockHalfNibbleLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockNibbleLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockShortLayer;
-import finalforeach.cosmicreach.savelib.blockdata.layers.BlockSingleLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.IBlockLayer;
 class TestBlockValue
 {
@@ -89,7 +88,7 @@ public class BlockDataTests
 	static Stream<Class<?>> getLayerClasses() 
 	{
 	    return Stream.of(
-	    		BlockSingleLayer.class,
+	    		//BlockSingleLayer.class,
 	    		BlockBitLayer.class, BlockHalfNibbleLayer.class, 
 	    		BlockNibbleLayer.class, BlockByteLayer.class, 
 	    		BlockShortLayer.class);

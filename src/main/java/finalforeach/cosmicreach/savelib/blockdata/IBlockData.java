@@ -10,7 +10,6 @@ public interface IBlockData<T> extends ISaveFileConstant
 {
 	public static final int CHUNK_WIDTH = ISavedChunk.CHUNK_WIDTH;
 	public T getBlockValue(int localX, int localY, int localZ);
-	public int getBlockValueID(int localX, int localY, int localZ);
 	
 	public IBlockData<T> setBlockValue(T block, int localX, int localY, int localZ);
 	public IBlockData<T> fill(T block);

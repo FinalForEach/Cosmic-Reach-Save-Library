@@ -14,8 +14,8 @@ import finalforeach.cosmicreach.savelib.blockdata.layers.BlockByteLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockHalfNibbleLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockNibbleLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockShortLayer;
-import finalforeach.cosmicreach.savelib.blockdata.layers.BlockSingleLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.IBlockLayer;
+import finalforeach.cosmicreach.savelib.blockdata.layers.IBlockSingleLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.SharedBlockSingleLayer;
 
 public class LayeredBlockData<T> implements IBlockData<T>
@@ -58,10 +58,6 @@ public class LayeredBlockData<T> implements IBlockData<T>
 	}
 
 	@Override
-	public int getBlockValueID(int localX, int localY, int localZ) {
-		return layers[localY].getBlockValueID(this, localX, localZ);
-	}
-	@Override
 	public IBlockData<T> setBlockValue(T blockState, int localX, int localY, int localZ) 
 	{
 		layers[localY].setBlockValue(this, blockState, localX, localY, localZ);
@@ -76,17 +72,14 @@ public class LayeredBlockData<T> implements IBlockData<T>
 	@Override
 	public IBlockData<T> fillLayer(T blockState, int localY)
 	{
-		if(layers[localY] instanceof BlockSingleLayer<T> s) 
+		if(layers[localY] == null || layers[localY] instanceof IBlockSingleLayer) 
 		{
-			s.fill(this, localY, blockState);
-		}else 
-		{
-			layers[localY] = SharedBlockSingleLayer.get(this, blockState);
+			setLayer(localY, SharedBlockSingleLayer.get(this, blockState));
 		}
 
 		for(int i = 0; i < CHUNK_WIDTH; i++) 
 		{
-			if(!(layers[i] instanceof BlockSingleLayer<T> s && s.blockValue == blockState)) 
+			if(!(layers[i] instanceof IBlockSingleLayer<T> s && s.getBlockValue() == blockState)) 
 			{
 				return this;
 			}
@@ -140,11 +133,12 @@ public class LayeredBlockData<T> implements IBlockData<T>
 
 	public void setLayer(int yLevel, IBlockLayer<T> layer) 
 	{
-		if(layer instanceof SharedBlockSingleLayer<T> shared) 
+		if(layer instanceof IBlockSingleLayer<T> single) 
 		{
-			if(!paletteHasValue(shared.blockValue)) 
+			var blockValue = single.getBlockValue();
+			if(!paletteHasValue(blockValue)) 
 			{
-				addToPalette(shared.blockValue);
+				addToPalette(blockValue);
 			}
 		}
 		layers[yLevel] = layer;
@@ -247,14 +241,9 @@ public class LayeredBlockData<T> implements IBlockData<T>
 		for(int j = 0; j < CHUNK_WIDTH; j++) 
 		{
 			var layer = getLayer(j);
-			if(layer instanceof SharedBlockSingleLayer<T> shared) 
+			if(layer instanceof IBlockSingleLayer<T> singleLayer) 
 			{
-				tempBlockData.setLayer(j, layer);
-				final var blockValue = shared.blockValue;
-				if(!tempBlockData.paletteHasValue(blockValue)) 
-				{
-					tempBlockData.addToPalette(blockValue);	
-				}
+				tempBlockData.setLayer(j, SharedBlockSingleLayer.get(tempBlockData, singleLayer.getBlockValue()));
 			}else 
 			{		
 				for(int i = 0; i < CHUNK_WIDTH; i++) 

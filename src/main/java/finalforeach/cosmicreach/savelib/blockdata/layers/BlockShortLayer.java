@@ -47,7 +47,6 @@ public class BlockShortLayer<T> implements IBlockLayer<T>
 		return chunkData.getBlockValueFromPaletteId(getBlockValueID(chunkData, localX, localZ));
 	}
 
-	@Override
 	public int getBlockValueID(LayeredBlockData<T> chunkData, int localX, int localZ) {
 		int idx = localX + (localZ * CHUNK_WIDTH);
 		short blockID = blockIDs[idx];

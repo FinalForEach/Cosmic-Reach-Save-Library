@@ -30,10 +30,6 @@ public class SingleBlockData<T> implements IBlockData<T>
 	{
 		return blockValue;
 	}
-	@Override
-	public int getBlockValueID(int localX, int localY, int localZ) {
-		return 0;
-	}
 
 	@Override
 	public IBlockData<T> setBlockValue(T blockState, int localX, int localY, int localZ)

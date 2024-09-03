@@ -43,7 +43,6 @@ public class BlockByteLayer<T> implements IBlockLayer<T>
 		return chunkData.getBlockValueFromPaletteId(getBlockValueID(chunkData, localX, localZ));
 	}
 
-	@Override
 	public int getBlockValueID(LayeredBlockData<T> chunkData, int localX, int localZ) {
 		int idx = localX + (localZ * CHUNK_WIDTH);
 		byte blockID = blockIDs[idx];
@@ -72,26 +71,6 @@ public class BlockByteLayer<T> implements IBlockLayer<T>
 		{
 			return;
 		}
-		/*if(!chunkData.paletteHasValue(blockValue))
-		{
-			chunkData.addToPalette(blockValue);
-		}
-		
-		int fullPaletteID = chunkData.getBlockValueID(blockValue);
-		
-		if(fullPaletteID > 255)
-		{
-			chunkData.cleanPalette();
-			if(chunkData.getPaletteSize() <= 255) 
-			{
-				chunkData.setBlockValue(blockValue, localX, localY, localZ);
-				return;
-			}
-			final var layer = new BlockShortLayer<T>(chunkData, localY, this);
-			layer.setBlockValue(chunkData, blockValue, localX, localY, localZ);
-			chunkData.setLayer(localY, layer);
-			return;
-		}*/
 		
 		final T oldBlock = getBlockValue(chunkData, localX, localZ);
 		if(blockValue != oldBlock) 

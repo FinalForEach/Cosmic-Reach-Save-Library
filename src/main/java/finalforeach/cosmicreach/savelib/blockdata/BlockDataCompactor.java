@@ -1,7 +1,7 @@
 package finalforeach.cosmicreach.savelib.blockdata;
 
 import finalforeach.cosmicreach.savelib.ISavedChunk;
-import finalforeach.cosmicreach.savelib.blockdata.layers.BlockSingleLayer;
+import finalforeach.cosmicreach.savelib.blockdata.layers.IBlockSingleLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.SharedBlockSingleLayer;
 
 public class BlockDataCompactor 
@@ -16,7 +16,7 @@ public class BlockDataCompactor
 			for(int yLevel = 0; yLevel < allLayers.length; yLevel++) 
 			{
 				var layer = allLayers[yLevel];
-				if(layer instanceof BlockSingleLayer) 
+				if(layer instanceof IBlockSingleLayer) 
 				{
 					continue; // Do nothing, already compact!
 				}
@@ -28,11 +28,11 @@ public class BlockDataCompactor
 					for(int k = 0; k < CHUNK_WIDTH; k++) 
 					{
 						T curBlockState = layer.getBlockValue(layered, i, k);
-						if(layerBlockState==null) 
+						if(layerBlockState == null) 
 						{
 							layerBlockState = curBlockState;
 							continue;
-						}else if(layerBlockState!=curBlockState) 
+						}else if(layerBlockState != curBlockState) 
 						{
 							layerBlockState = null;
 							// Cannot compact it, blocks are different in layer

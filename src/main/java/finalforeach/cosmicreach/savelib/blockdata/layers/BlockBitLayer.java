@@ -40,7 +40,6 @@ public class BlockBitLayer<T> implements IBlockLayer<T>
 		}
 	}
 
-	@Override
 	public int getBlockValueID(LayeredBlockData<T> chunkData, int localX, int localZ) {
 		final int idx = (localX + (localZ * CHUNK_WIDTH)) / 8;
 		final byte b = blockIDs[idx];

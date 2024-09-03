@@ -53,7 +53,6 @@ public class BlockNibbleLayer<T> implements IBlockLayer<T>
 		return chunkData.getBlockValueFromPaletteId(getBlockValueID(chunkData, localX, localZ));
 	}
 	
-	@Override
 	public int getBlockValueID(LayeredBlockData<T> chunkData, int localX, int localZ)
 	{
 		final int idx = (localX + (localZ * CHUNK_WIDTH)) / 2;
