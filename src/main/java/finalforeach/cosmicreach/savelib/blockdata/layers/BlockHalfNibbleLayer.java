@@ -44,13 +44,14 @@ public class BlockHalfNibbleLayer<T> implements IBlockLayer<T>
 		final int idx = (localX + (localZ * CHUNK_WIDTH)) / 4;
 		final byte b = blockIDs[idx];
 		
-		int blockID = switch (localX % 4) 
+		int mod = localX % 4;
+		int blockID = switch (mod) 
 		{
 			case 0 -> b & 0x03;
 			case 1 -> (b & 0x0C) >> 2;
-			case 2 -> ((b & 0x30) >> 4);
+			case 2 -> (b & 0x30) >> 4;
 			case 3 -> (b & 0xC0) >> 6;
-			default -> throw new IllegalArgumentException("Unexpected value: " + localX % 4);
+			default -> throw new IllegalArgumentException("Unexpected value: " + mod);
 		};
 		return blockID;
 	}
@@ -64,12 +65,7 @@ public class BlockHalfNibbleLayer<T> implements IBlockLayer<T>
 	@Override
 	public void setBlockValue(LayeredBlockData<T> chunkData, T blockValue, int localX, int localY, int localZ) 
 	{
-		int paletteID = chunkData.getBlockValueID(blockValue);
-		if(paletteID==-1) 
-		{
-			paletteID = chunkData.getPaletteSize();
-			chunkData.addToPalette(blockValue);
-		}
+		int paletteID = chunkData.getBlockValueIDAddIfMissing(blockValue);
 		if(paletteID > 3)
 		{
 			final var layer = new BlockNibbleLayer<T>(chunkData, localY, this);

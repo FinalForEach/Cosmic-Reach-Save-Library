@@ -169,6 +169,21 @@ public class LayeredBlockData<T> implements IBlockData<T>
 		return -1;
 	}
 	
+	public int getBlockValueIDAddIfMissing(T blockValue) 
+	{
+		final int paletteSize = getPaletteSize();
+		for(int i = 0; i < paletteSize; i++) 
+		{
+			if(blockStatePalette[i]==blockValue) 
+			{
+				return i;
+			}
+		}
+		int newPaletteID = getPaletteSize();
+		addToPalette(blockValue);
+		return newPaletteID;
+	}
+	
 	@Override
 	public T getBlockValueFromPaletteId(int bId) 
 	{

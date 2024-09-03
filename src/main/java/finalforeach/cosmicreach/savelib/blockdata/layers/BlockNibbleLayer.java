@@ -67,12 +67,7 @@ public class BlockNibbleLayer<T> implements IBlockLayer<T>
 	@Override
 	public void setBlockValue(LayeredBlockData<T> chunkData, T blockValue, int localX, int localY, int localZ) 
 	{
-		int paletteID = chunkData.getBlockValueID(blockValue);
-		if(paletteID == -1) 
-		{
-			paletteID = chunkData.getPaletteSize();
-			chunkData.addToPalette(blockValue);
-		}
+		int paletteID = chunkData.getBlockValueIDAddIfMissing(blockValue);
 		if(paletteID > 15)
 		{
 			final var layer = new BlockByteLayer<T>(chunkData, localY, this);

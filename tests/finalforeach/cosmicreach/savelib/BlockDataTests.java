@@ -87,6 +87,7 @@ public class BlockDataTests
 	    return Stream.of(
 	    		BlockBitLayer.class, BlockByteLayer.class, 
 	    		BlockHalfNibbleLayer.class, BlockNibbleLayer.class,
+	    		BlockByteLayer.class,
 	    		BlockShortLayer.class, BlockSingleLayer.class);
 	}
 	
