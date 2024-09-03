@@ -29,14 +29,15 @@ public class BlockShortLayer<T> implements IBlockLayer<T>
 		}
 	}
 	
-	public BlockShortLayer(LayeredBlockData<T> chunkData, int localY, BlockByteLayer<T> blockByteLayer) {
+	public BlockShortLayer(LayeredBlockData<T> chunkData, int localY, IBlockLayer<T> srcBlockLayer) {
 
 		this.blockIDs = new short[NUM_BLOCKS_IN_LAYER];
 		for(int i = 0; i < CHUNK_WIDTH; i++) 
 		{
 			for(int k = 0; k < CHUNK_WIDTH; k++) 
 			{
-				setBlockValue(chunkData, blockByteLayer.getBlockValue(chunkData, i, k), i, localY, k);
+				var blockValue = srcBlockLayer.getBlockValue(chunkData, i, k);
+				setBlockValue(chunkData, blockValue, i, localY, k);
 			}
 		}
 	}

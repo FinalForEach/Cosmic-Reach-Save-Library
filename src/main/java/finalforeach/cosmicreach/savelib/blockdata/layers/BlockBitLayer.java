@@ -6,6 +6,7 @@ import finalforeach.cosmicreach.savelib.blockdata.LayeredBlockData;
 
 public class BlockBitLayer<T> implements IBlockLayer<T>
 {
+	public static final int TOTAL_BYTES = CHUNK_WIDTH * CHUNK_WIDTH / 8;
 	private final byte[] blockIDs;
 	
 	public BlockBitLayer(byte[] bytes) 
@@ -15,7 +16,7 @@ public class BlockBitLayer<T> implements IBlockLayer<T>
 	
 	public BlockBitLayer(LayeredBlockData<T> chunkData, int localY, IBlockLayer<T> srcLayer) 
 	{
-		this.blockIDs = new byte[CHUNK_WIDTH * CHUNK_WIDTH / 8];
+		this.blockIDs = new byte[TOTAL_BYTES];
 		for(int i = 0; i < CHUNK_WIDTH; i++) 
 		{
 			for(int k = 0; k < CHUNK_WIDTH; k++) 
@@ -28,7 +29,7 @@ public class BlockBitLayer<T> implements IBlockLayer<T>
 	
 	public BlockBitLayer(LayeredBlockData<T> chunkData, int localY, T blockState) 
 	{
-		this.blockIDs = new byte[CHUNK_WIDTH * CHUNK_WIDTH / 8];
+		this.blockIDs = new byte[TOTAL_BYTES];
 		
 		for(int i = 0; i < CHUNK_WIDTH; i++) 
 		{
@@ -68,6 +69,13 @@ public class BlockBitLayer<T> implements IBlockLayer<T>
 
 	public boolean upgradeLayer(int paletteID, LayeredBlockData<T> chunkData, T blockValue, int localX, int localY, int localZ) 
 	{
+		if(paletteID > 255)
+		{
+			final var layer = new BlockShortLayer<T>(chunkData, localY, this);
+			layer.setBlockValue(chunkData, blockValue, localX, localY, localZ);
+			chunkData.setLayer(localY, layer);
+			return true;
+		}
 		if(paletteID > 15)
 		{
 			final var layer = new BlockByteLayer<T>(chunkData, localY, this);

@@ -15,7 +15,7 @@ public class SharedBlockSingleLayer<T> extends BlockSingleLayer<T>
 
 	public void fill(LayeredBlockData<T> chunkData, int localY, T blockValue) 
 	{
-		if(this.blockValue!=blockValue) 
+		if(this.blockValue != blockValue) 
 		{
 			chunkData.setLayer(localY, get(chunkData, blockValue));
 		}
@@ -25,7 +25,7 @@ public class SharedBlockSingleLayer<T> extends BlockSingleLayer<T>
 	public static <T> SharedBlockSingleLayer<T> get(LayeredBlockData<T> chunkData, T blockValue) 
 	{
 		var shared = sharedInstances.get(blockValue);
-		if(shared==null) 
+		if(shared == null) 
 		{
 			synchronized (sharedInstances) 
 			{

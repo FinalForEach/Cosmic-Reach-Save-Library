@@ -161,7 +161,7 @@ public class LayeredBlockData<T> implements IBlockData<T>
 		final int paletteSize = getPaletteSize();
 		for(int i = 0; i < paletteSize; i++) 
 		{
-			if(blockStatePalette[i]==blockValue) 
+			if(blockStatePalette[i] == blockValue) 
 			{
 				return i;
 			}
@@ -211,6 +211,7 @@ public class LayeredBlockData<T> implements IBlockData<T>
 	{
 		return SaveFileConstants.BLOCK_LAYERED;
 	}
+	
 	@Override
 	public void writeTo(IChunkByteWriter allChunksWriter) 
 	{
@@ -246,9 +247,14 @@ public class LayeredBlockData<T> implements IBlockData<T>
 		for(int j = 0; j < CHUNK_WIDTH; j++) 
 		{
 			var layer = getLayer(j);
-			if(layer instanceof SharedBlockSingleLayer<T>) 
+			if(layer instanceof SharedBlockSingleLayer<T> shared) 
 			{
 				tempBlockData.setLayer(j, layer);
+				final var blockValue = shared.blockValue;
+				if(!tempBlockData.paletteHasValue(blockValue)) 
+				{
+					tempBlockData.addToPalette(blockValue);	
+				}
 			}else 
 			{		
 				for(int i = 0; i < CHUNK_WIDTH; i++) 

@@ -6,6 +6,7 @@ import finalforeach.cosmicreach.savelib.blockdata.LayeredBlockData;
 
 public class BlockByteLayer<T> implements IBlockLayer<T>
 {
+	public static final int TOTAL_BYTES = CHUNK_WIDTH * CHUNK_WIDTH;
 	private final byte[] blockIDs;
 
 	public BlockByteLayer(byte[] bytes) 
@@ -15,7 +16,7 @@ public class BlockByteLayer<T> implements IBlockLayer<T>
 
 	public BlockByteLayer(LayeredBlockData<T> chunkData, int localY, T blockValue) 
 	{
-		this.blockIDs = new byte[CHUNK_WIDTH * CHUNK_WIDTH];
+		this.blockIDs = new byte[TOTAL_BYTES];
 		for(int i = 0; i < CHUNK_WIDTH; i++) 
 		{
 			for(int k = 0; k < CHUNK_WIDTH; k++) 
@@ -27,7 +28,7 @@ public class BlockByteLayer<T> implements IBlockLayer<T>
 	
 	public BlockByteLayer(LayeredBlockData<T> chunkData, int localY, IBlockLayer<T> nibbleLayer) 
 	{
-		this.blockIDs = new byte[CHUNK_WIDTH * CHUNK_WIDTH];
+		this.blockIDs = new byte[TOTAL_BYTES];
 		for(int i = 0; i < CHUNK_WIDTH; i++) 
 		{
 			for(int k = 0; k < CHUNK_WIDTH; k++) 
@@ -50,10 +51,28 @@ public class BlockByteLayer<T> implements IBlockLayer<T>
 		return blockID & 0xFF;
 	}
 
+	public boolean upgradeLayer(int paletteID, LayeredBlockData<T> chunkData, T blockValue, int localX, int localY, int localZ) 
+	{
+		if(paletteID > 255)
+		{
+			final var layer = new BlockShortLayer<T>(chunkData, localY, this);
+			layer.setBlockValue(chunkData, blockValue, localX, localY, localZ);
+			chunkData.setLayer(localY, layer);
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public void setBlockValue(LayeredBlockData<T> chunkData, T blockValue, int localX, int localY, int localZ) 
 	{
-		if(!chunkData.paletteHasValue(blockValue))
+		int paletteID = chunkData.getBlockValueIDAddIfMissing(blockValue);
+
+		if(upgradeLayer(paletteID, chunkData, blockValue, localX, localY, localZ)) 
+		{
+			return;
+		}
+		/*if(!chunkData.paletteHasValue(blockValue))
 		{
 			chunkData.addToPalette(blockValue);
 		}
@@ -72,13 +91,13 @@ public class BlockByteLayer<T> implements IBlockLayer<T>
 			layer.setBlockValue(chunkData, blockValue, localX, localY, localZ);
 			chunkData.setLayer(localY, layer);
 			return;
-		}
+		}*/
 		
 		final T oldBlock = getBlockValue(chunkData, localX, localZ);
-		if(blockValue!=oldBlock) 
+		if(blockValue != oldBlock) 
 		{
 			final int idx = localX + (localZ * CHUNK_WIDTH);
-			blockIDs[idx] = (byte) fullPaletteID;
+			blockIDs[idx] = (byte) paletteID;
 		}
 	}
 
