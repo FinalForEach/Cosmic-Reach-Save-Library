@@ -174,7 +174,7 @@ public class LayeredBlockData<T> implements IBlockData<T>
 		final int paletteSize = getPaletteSize();
 		for(int i = 0; i < paletteSize; i++) 
 		{
-			if(blockStatePalette[i]==blockValue) 
+			if(blockStatePalette[i] == blockValue) 
 			{
 				return i;
 			}

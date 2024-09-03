@@ -25,7 +25,7 @@ public class BlockByteLayer<T> implements IBlockLayer<T>
 		}
 	}
 	
-	public BlockByteLayer(LayeredBlockData<T> chunkData, int localY, BlockNibbleLayer<T> nibbleLayer) 
+	public BlockByteLayer(LayeredBlockData<T> chunkData, int localY, IBlockLayer<T> nibbleLayer) 
 	{
 		this.blockIDs = new byte[CHUNK_WIDTH * CHUNK_WIDTH];
 		for(int i = 0; i < CHUNK_WIDTH; i++) 

@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import finalforeach.cosmicreach.savelib.blockdata.BlockDataCompactor;
+import finalforeach.cosmicreach.savelib.blockdata.IBlockData;
 import finalforeach.cosmicreach.savelib.blockdata.LayeredBlockData;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockBitLayer;
 import finalforeach.cosmicreach.savelib.blockdata.layers.BlockByteLayer;
@@ -41,7 +42,7 @@ public class BlockDataTests
 	static TestBlockValue[] blockValues = new TestBlockValue[4096];
 	static TestBlockValue valueA;
 	TestBlockValue valueNeverUsed = new TestBlockValue(-1);
-	LayeredBlockData<TestBlockValue> blockData;
+	IBlockData<TestBlockValue> blockData;
 	@BeforeAll
 	static void setupBeforeAll()
 	{
@@ -97,11 +98,12 @@ public class BlockDataTests
     {
 		@SuppressWarnings("unchecked")
 		var layerClazz = (Class<IBlockLayer<TestBlockValue>>)layerClazzParam;
-		blockData = new LayeredBlockData<>();
+		var layered = new LayeredBlockData<TestBlockValue>();
+		blockData = layered;
     	for(int i = 0; i < 16; i++) 
     	{
-    		var layer = createLayer(layerClazz, blockData, i, valueA);
-    		blockData.setLayer(i, layer);
+    		var layer = createLayer(layerClazz, layered, i, valueA);
+    		layered.setLayer(i, layer);
     	}
         assertTrue(blockData.hasValueInPalette(valueA));
         assertFalse(blockData.hasValueInPalette(valueNeverUsed));
@@ -145,11 +147,12 @@ public class BlockDataTests
     
     public void testForNValues(int n, Class<IBlockLayer<TestBlockValue>> layerClazz) throws Exception 
     {
-		blockData = new LayeredBlockData<>();
+		var layered = new LayeredBlockData<TestBlockValue>();
+		blockData = layered;
     	for(int i = 0; i < CHUNK_WIDTH; i++) 
     	{
-    		var layer = createLayer(layerClazz, blockData, i, valueA);
-    		blockData.setLayer(i, layer);
+    		var layer = createLayer(layerClazz, layered, i, valueA);
+    		layered.setLayer(i, layer);
     	}
     	
     	for(int i = 0; i < CHUNK_WIDTH; i++) 
@@ -167,7 +170,16 @@ public class BlockDataTests
     	    		}
 
     				set[i][j][k] = value;
-	    			blockData.setBlockValue(value, i, j, k);
+    				
+    				var oldLayered = (LayeredBlockData<TestBlockValue>)blockData;
+    				var oldLayer = oldLayered.getLayer(j);
+    				
+    				blockData = blockData.setBlockValue(value, i, j, k);
+	    			if(!value.equals(blockData.getBlockValue(i, j, k))) 
+	    			{
+	    				int q = 0;
+	    				oldLayer.setBlockValue(oldLayered, value, i, j, k);
+	    			}
     				assertEquals(value, blockData.getBlockValue(i, j, k));
     				
     	    	}	

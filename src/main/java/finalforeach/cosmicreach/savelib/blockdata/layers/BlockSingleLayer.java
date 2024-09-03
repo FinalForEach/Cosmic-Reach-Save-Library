@@ -42,8 +42,7 @@ public class BlockSingleLayer<T> implements IBlockLayer<T>
 			return;
 		}else 
 		{
-			final var layer = new BlockNibbleLayer<T>(chunkData, localY, this.blockValue);
-			//final var layer = new BlockBitLayer<T>(chunkData, localY, this.blockValue);
+			final var layer = new BlockBitLayer<T>(chunkData, localY, this.blockValue);
 			chunkData.setLayer(localY, layer);
 			layer.setBlockValue(chunkData, blockState, localX, localY, localZ);
 		}

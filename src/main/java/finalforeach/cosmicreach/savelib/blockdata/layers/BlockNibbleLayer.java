@@ -40,7 +40,8 @@ public class BlockNibbleLayer<T> implements IBlockLayer<T>
 		{
 			for(int k = 0; k < CHUNK_WIDTH; k++) 
 			{
-				setBlockValue(chunkData, srcLayer.getBlockValue(chunkData, i, k), i, localY, k);
+				var blockValue = srcLayer.getBlockValue(chunkData, i, k);
+				setBlockValue(chunkData, blockValue, i, localY, k);
 			}
 		}
 	}
@@ -64,15 +65,25 @@ public class BlockNibbleLayer<T> implements IBlockLayer<T>
 		return blockID;
 	}
 
-	@Override
-	public void setBlockValue(LayeredBlockData<T> chunkData, T blockValue, int localX, int localY, int localZ) 
+	
+	public boolean upgradeLayer(int paletteID, LayeredBlockData<T> chunkData, T blockValue, int localX, int localY, int localZ) 
 	{
-		int paletteID = chunkData.getBlockValueIDAddIfMissing(blockValue);
 		if(paletteID > 15)
 		{
 			final var layer = new BlockByteLayer<T>(chunkData, localY, this);
 			layer.setBlockValue(chunkData, blockValue, localX, localY, localZ);
 			chunkData.setLayer(localY, layer);
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public void setBlockValue(LayeredBlockData<T> chunkData, T blockValue, int localX, int localY, int localZ) 
+	{
+		int paletteID = chunkData.getBlockValueIDAddIfMissing(blockValue);
+		if(upgradeLayer(paletteID, chunkData, blockValue, localX, localY, localZ)) 
+		{
 			return;
 		}
 		

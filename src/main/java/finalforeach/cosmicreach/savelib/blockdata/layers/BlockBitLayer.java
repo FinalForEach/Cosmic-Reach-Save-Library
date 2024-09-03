@@ -66,15 +66,39 @@ public class BlockBitLayer<T> implements IBlockLayer<T>
 		return chunkData.getBlockValueFromPaletteId(getBlockValueID(chunkData, localX, localZ));
 	}
 
-	@Override
-	public void setBlockValue(LayeredBlockData<T> chunkData, T blockValue, int localX, int localY, int localZ) 
+	public boolean upgradeLayer(int paletteID, LayeredBlockData<T> chunkData, T blockValue, int localX, int localY, int localZ) 
 	{
-		int paletteID = chunkData.getBlockValueIDAddIfMissing(blockValue);
-		if(paletteID > 1)
+		if(paletteID > 15)
+		{
+			final var layer = new BlockByteLayer<T>(chunkData, localY, this);
+			layer.setBlockValue(chunkData, blockValue, localX, localY, localZ);
+			chunkData.setLayer(localY, layer);
+			return true;
+		}
+		if(paletteID > 3)
 		{
 			final var layer = new BlockNibbleLayer<T>(chunkData, localY, this);
 			layer.setBlockValue(chunkData, blockValue, localX, localY, localZ);
 			chunkData.setLayer(localY, layer);
+			return true;
+		}
+		if(paletteID > 1)
+		{
+			final var layer = new BlockHalfNibbleLayer<T>(chunkData, localY, this);
+			layer.setBlockValue(chunkData, blockValue, localX, localY, localZ);
+			chunkData.setLayer(localY, layer);
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public void setBlockValue(LayeredBlockData<T> chunkData, T blockValue, int localX, int localY, int localZ) 
+	{
+		int paletteID = chunkData.getBlockValueIDAddIfMissing(blockValue);
+
+		if(upgradeLayer(paletteID, chunkData, blockValue, localX, localY, localZ)) 
+		{
 			return;
 		}
 		
