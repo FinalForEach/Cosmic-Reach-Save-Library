@@ -95,7 +95,7 @@ public class SharedBlockSingleLayer<T> implements IBlockSingleLayer<T>
 			return;
 		}else 
 		{
-			upgradeLayer(chunkData.getBlockValueIDAddIfMissing(blockState),
+			upgradeLayer(chunkData.getBlockValueIDAddIfMissing(this.blockValue),
 					chunkData, blockState, localX, localY, localZ);
 		}
 	}
