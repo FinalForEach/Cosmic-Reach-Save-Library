@@ -23,4 +23,10 @@ public interface IDynamicArray<E> extends Iterable<E>
 	 * @param identity If true, == comparison will be used. If false, .equals() comparison will be used.
 	 * @return An index of first occurrence of value in array or -1 if no such value exists */
 	int indexOf(E value, boolean identity);
+
+	E[] items();
+
+	void clear();
+
+	E removeIndex(int index);
 }
