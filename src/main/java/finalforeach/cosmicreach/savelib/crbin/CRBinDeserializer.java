@@ -1,5 +1,6 @@
 package finalforeach.cosmicreach.savelib.crbin;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.Base64;
@@ -146,7 +147,8 @@ public class CRBinDeserializer
 				intValues.put(name, stringId);
 				break;
 			case OBJ:
-				objValues.put(name, readObj(bytes));
+				var o = readObj(bytes);
+				objValues.put(name, o);
 				break;
 			case OBJ_ARRAY:
 				length = ByteArrayUtils.readInt(bytes);
@@ -218,6 +220,7 @@ public class CRBinDeserializer
 			{
 				perElement.accept(arr, i);
 			}
+			
 			objValues.put(name, arr);
 		}
 	}
@@ -332,7 +335,7 @@ public class CRBinDeserializer
 	public <T> T readObj(String name, Class<T> elementType)
 	{
 		var func = classDeserializers.get(elementType);
-		if(func!=null) 
+		if(func != null) 
 		{
 			return (T)func.apply(name, this);
 		}
@@ -349,6 +352,11 @@ public class CRBinDeserializer
 				+ " neither has an associated class deserializer, nor is derived from ICosmicReachBinarySerializable!");
 	}
 
+	public CRBinDeserializer readRawObj(String name) 
+	{
+		var backing = (CRBinDeserializer) objValues.get(name);
+		return backing;
+	}
 	public CRBinDeserializer[] readRawObjArray(String name) 
 	{
 		var backing = (CRBinDeserializer[]) objValues.get(name);
@@ -378,6 +386,54 @@ public class CRBinDeserializer
 		{
 			e.printStackTrace();
 			throw new RuntimeException(e);
+		}
+	}
+
+	public void autoRead(Object obj) 
+	{
+		Class<?> clazz = obj.getClass();
+		
+		while(clazz != Object.class) 
+		{
+			var fields = clazz.getDeclaredFields();
+			
+			for(Field field : fields) 
+			{
+				if(field.isAnnotationPresent(CRBSerialized.class)) 
+				{
+					field.setAccessible(true);
+					try 
+					{
+						String name = field.getName();
+						var type = field.getType();
+						if(type == int.class) 
+						{
+							field.set(obj, readInt(name, field.getInt(obj)));
+						}
+						else if(type == float.class) 
+						{
+							field.set(obj, readFloat(name, field.getFloat(obj)));
+						}else if(type == boolean.class) 
+						{
+							field.set(obj, readBoolean(name, field.getBoolean(obj)));
+						}else if(type == String.class)
+						{
+							field.set(obj, readString(name));
+						}else if(!type.isPrimitive()) 
+						{
+							field.set(obj, readObj(name, type));
+						}
+						else
+						{
+							throw new RuntimeException("Not yet implemented for type: " + type.getSimpleName());
+						}
+					} catch (IllegalArgumentException | IllegalAccessException e) 
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+			clazz = clazz.getSuperclass();
 		}
 	}
 }

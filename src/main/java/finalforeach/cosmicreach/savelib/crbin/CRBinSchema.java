@@ -85,4 +85,19 @@ public class CRBinSchema
 		CRBinSchema other = (CRBinSchema) obj;
 		return Objects.equals(schema, other.schema);
 	}
+	
+	@Override
+	public String toString() 
+	{
+		StringBuilder sb = new StringBuilder("[");
+		for(var s : schema) 
+		{
+			sb.append(s.name);
+			sb.append(":");
+			sb.append(s.type);
+			sb.append(",");
+		}
+		sb.append("]");
+		return sb.toString();
+	}
 }

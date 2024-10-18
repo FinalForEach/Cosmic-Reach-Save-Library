@@ -1,5 +1,6 @@
 package finalforeach.cosmicreach.savelib.crbin;
 
+import java.lang.reflect.Field;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.function.IntConsumer;
@@ -334,5 +335,54 @@ public class CRBinSerializer
 
 		schema = oldSchema;
 		bytes = oldBytes;
+	}
+
+	public void autoWrite(Object obj)
+	{
+		Class<?> clazz = obj.getClass();
+		while(clazz != Object.class) 
+		{
+			var fields = clazz.getDeclaredFields();
+			
+			for(Field field : fields) 
+			{
+				if(field.isAnnotationPresent(CRBSerialized.class)) 
+				{
+					field.setAccessible(true);
+					try 
+					{
+						String name = field.getName();
+						var type = field.getType();
+						if(type == int.class) 
+						{
+							writeInt(name, field.getInt(obj));
+						}
+						else if(type == float.class) 
+						{
+							writeFloat(name, field.getFloat(obj));
+						}else if(type == boolean.class) 
+						{
+							writeBoolean(name, field.getBoolean(obj));
+						}else if(type == String.class) 
+						{
+							writeString(name, (String) field.get(obj));
+						}
+						else if(!type.isPrimitive())
+						{
+							writeObj(type, name, field.get(obj));
+						}else 
+						{
+							throw new RuntimeException("Not yet implemented for type: " + type.getSimpleName());
+						}
+					} catch (IllegalArgumentException | IllegalAccessException e) 
+					{
+						System.err.println("Write error for " + obj.getClass().getSimpleName());
+						e.printStackTrace();
+					}
+				}
+			}
+			clazz = clazz.getSuperclass();
+		}
+		
 	}
 }
