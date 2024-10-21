@@ -267,7 +267,7 @@ public class CRBinTests
 				return new TestDynamicArray<E>();
 			}
 		};
-		
+		DynamicArrays.instantiator = null;
 		ObjectMaps.instantiator = new IObjectMapInstantiator() {
 			
 			@Override
