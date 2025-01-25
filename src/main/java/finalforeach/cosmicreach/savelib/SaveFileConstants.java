@@ -5,9 +5,12 @@ public class SaveFileConstants
 {
 	// [F]inal[F]or[E]ach [C]osmi[c]r[eac]h
 	public static final int MAGIC = 0xFFECCEAC;
-	public static final int FILE_VERSION = 2;	
+	public static final int FILE_VERSION = 2; // TODO: Upgrade to 3 when adding LZ4 properly
 	public static final int COMPRESSION_TYPE_NONE = 0;
+	public static final int COMPRESSION_TYPE_LZ4 = 1;
 
+	public static int PREFERRED_COMPRESSION_TYPE = COMPRESSION_TYPE_NONE;//COMPRESSION_TYPE_LZ4;
+	
 	public static final int BLOCK_NULL = 0;
 	public static final int BLOCK_SINGLE = 1;
 	public static final int BLOCK_LAYERED = 2;
@@ -42,4 +45,5 @@ public class SaveFileConstants
 	
 	public static final int ENTITIES_NULL = 0;
 	public static final int ENTITIES_DATA = 1;
+	
 }
