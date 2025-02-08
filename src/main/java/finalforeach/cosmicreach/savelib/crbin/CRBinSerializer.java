@@ -3,6 +3,7 @@ package finalforeach.cosmicreach.savelib.crbin;
 import java.lang.reflect.Field;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.function.IntConsumer;
 
 import finalforeach.cosmicreach.savelib.IByteArray;
@@ -337,6 +338,112 @@ public class CRBinSerializer
 		bytes = oldBytes;
 	}
 
+	public void autoWriteDifference(Object prototype, Object obj) 
+	{
+		Class<?> prototypeClazz = prototype.getClass();
+		Class<?> clazz = obj.getClass();
+		
+		if(!prototypeClazz.isInstance(obj)) 
+		{
+			throw new RuntimeException("Object is not an instance of the class or instance of a subclass of the prototype's class.");
+		}
+		
+		while(clazz != Object.class) 
+		{
+			var fields = clazz.getDeclaredFields();
+			
+			for(Field field : fields) 
+			{
+				if(field.isAnnotationPresent(CRBSerialized.class)) 
+				{
+					field.setAccessible(true);
+					try 
+					{
+						String name = field.getName();
+						var type = field.getType();
+						Field protoField;
+						try
+						{
+							if(prototypeClazz == clazz) 
+							{
+								protoField = field; 
+							}
+							protoField = prototypeClazz.getDeclaredField(name);
+						} catch (NoSuchFieldException | SecurityException e)
+						{
+							protoField = null;
+						}
+						if(type == int.class) 
+						{
+							var objVal = field.getInt(obj);
+							if(protoField != null) 
+							{
+								var protoVal = protoField.getInt(prototype);
+								if(protoVal == objVal) 
+								{
+									continue;
+								}
+							}
+							writeInt(name, objVal);
+						}
+						else if(type == float.class) 
+						{
+							var objVal = field.getFloat(obj);
+							if(protoField != null) 
+							{
+								var protoVal = protoField.getFloat(prototype);
+								if(protoVal == objVal) 
+								{
+									continue;
+								}
+							}
+							writeFloat(name, objVal);
+						}else if(type == boolean.class) 
+						{
+							var objVal = field.getBoolean(obj);
+							if(protoField != null) 
+							{
+								var protoVal = protoField.getBoolean(prototype);
+								if(protoVal == objVal) 
+								{
+									continue;
+								}
+							}
+							writeBoolean(name, objVal);
+						}
+						else if(!type.isPrimitive())
+						{
+							var objVal = field.get(obj);
+							if(protoField != null) 
+							{
+								var protoVal = protoField.get(prototype);
+								if(Objects.equals(objVal, protoVal)) 
+								{
+									continue;
+								}
+							}
+							if(type == String.class) 
+							{
+								writeString(name, (String)objVal);
+							}else 
+							{
+								writeObj(type, name, objVal);	
+							}
+						}else 
+						{
+							throw new RuntimeException("Not yet implemented for type: " + type.getSimpleName());
+						}
+					} catch (IllegalArgumentException | IllegalAccessException e) 
+					{
+						System.err.println("Write error for " + obj.getClass().getSimpleName());
+						e.printStackTrace();
+					}
+				}
+			}
+			clazz = clazz.getSuperclass();
+		}
+	}
+	
 	public void autoWrite(Object obj)
 	{
 		Class<?> clazz = obj.getClass();
