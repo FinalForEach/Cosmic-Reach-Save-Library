@@ -369,6 +369,7 @@ public class CRBinSerializer
 								protoField = field; 
 							}
 							protoField = prototypeClazz.getDeclaredField(name);
+							protoField.setAccessible(true);
 						} catch (NoSuchFieldException | SecurityException e)
 						{
 							protoField = null;
