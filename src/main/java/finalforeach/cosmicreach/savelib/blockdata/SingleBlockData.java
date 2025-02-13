@@ -12,21 +12,22 @@ public class SingleBlockData<T> implements IBlockData<T>
 {
 	private T blockValue;
 
-	public SingleBlockData() 
+	public SingleBlockData()
 	{
 	}
-	public SingleBlockData(T blockValue) 
+
+	public SingleBlockData(T blockValue)
 	{
 		this.blockValue = blockValue;
 	}
 
-	public T getBlockState() 
+	public T getBlockState()
 	{
 		return blockValue;
 	}
-	
+
 	@Override
-	public T getBlockValue(int localX, int localY, int localZ) 
+	public T getBlockValue(int localX, int localY, int localZ)
 	{
 		return blockValue;
 	}
@@ -34,7 +35,7 @@ public class SingleBlockData<T> implements IBlockData<T>
 	@Override
 	public IBlockData<T> setBlockValue(T blockState, int localX, int localY, int localZ)
 	{
-		if(this.blockValue!=blockState) 
+		if (this.blockValue != blockState)
 		{
 			var chunkData = new LayeredBlockData<T>(this.blockValue);
 			return chunkData.setBlockValue(blockState, localX, localY, localZ);
@@ -42,70 +43,74 @@ public class SingleBlockData<T> implements IBlockData<T>
 		return this;
 	}
 
-	public IBlockData<T> fill(T blockState) 
-	{	
+	public IBlockData<T> fill(T blockState)
+	{
 		this.blockValue = blockState;
 		return this;
 	}
-	
+
 	@Override
-	public IBlockData<T> fillLayer(T blockState, int localY) 
+	public IBlockData<T> fillLayer(T blockState, int localY)
 	{
-		if(this.blockValue!=blockState) 
+		if (this.blockValue != blockState)
 		{
 			var chunkData = new LayeredBlockData<T>(this.blockValue);
 			return chunkData.fillLayer(blockState, localY);
 		}
 		return this;
 	}
-	
+
 	@Override
-	public boolean isEntirely(T blockValue) 
+	public boolean isEntirely(T blockValue)
 	{
 		return this.blockValue == blockValue;
 	}
-	
+
 	@Override
-	public boolean isEntirely(Predicate<T> predicate) 
+	public boolean isEntirely(Predicate<T> predicate)
 	{
 		return predicate.test(blockValue);
 	}
 
 	@Override
-	public int getBlockValueID(T blockState) {
-		return blockState==this.blockValue? 0 : -1;
+	public int getBlockValueID(T blockState)
+	{
+		return blockState == this.blockValue ? 0 : -1;
 	}
 
 	@Override
-	public T getBlockValueFromPaletteId(int bId) {
-		return bId==0 ? blockValue : null;
+	public T getBlockValueFromPaletteId(int bId)
+	{
+		return bId == 0 ? blockValue : null;
 	}
+
 	@Override
-	public int getUniqueBlockValuesCount() 
+	public int getUniqueBlockValuesCount()
 	{
 		return 1;
 	}
-	
+
 	@Override
-	public int getSaveFileConstant() 
+	public int getSaveFileConstant()
 	{
 		return SaveFileConstants.BLOCK_SINGLE;
 	}
-	
+
 	@Override
-	public void writeTo(IChunkByteWriter allChunksWriter) 
+	public void writeTo(IChunkByteWriter allChunksWriter)
 	{
 		allChunksWriter.writeBlockValue(blockValue);
 	}
-	
-	public static <T> IBlockData<T> readFrom(IChunkByteReader reader, Function<String, T> saveKeyToBlockValue) throws IOException 
+
+	public static <T> IBlockData<T> readFrom(IChunkByteReader reader, Function<String, T> saveKeyToBlockValue)
+			throws IOException
 	{
 		String blockStateSaveKey = reader.readString();
 		return new SingleBlockData<T>(saveKeyToBlockValue.apply(blockStateSaveKey));
 	}
-	
+
 	@Override
-	public boolean hasValueInPalette(T value) 
+	public boolean hasValueInPalette(T value)
 	{
 		return this.blockValue == value;
 	}
