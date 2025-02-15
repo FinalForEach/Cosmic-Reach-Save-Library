@@ -209,6 +209,10 @@ public class CRBinSerializer
 		writeNullArray(name, SchemaType.OBJ_ARRAY);
 	}
 
+	public <T extends ICRBinSerializable> void writeObjArray(String name, IDynamicArray<T> array)
+	{
+		writeArray(name, SchemaType.OBJ_ARRAY, array.size(), (i) -> writeObj(null, array.get(i)));
+	}
 	public <T extends ICRBinSerializable> void writeObjArray(String name, T[] array)
 	{
 		writeArray(name, SchemaType.OBJ_ARRAY, array.length, (i) -> writeObj(null, array[i]));

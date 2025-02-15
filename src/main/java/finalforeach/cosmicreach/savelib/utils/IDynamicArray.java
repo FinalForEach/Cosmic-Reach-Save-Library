@@ -29,4 +29,14 @@ public interface IDynamicArray<E> extends Iterable<E>
 	void clear();
 
 	E removeIndex(int index);
+
+	default boolean isEmpty() 
+	{
+		return size() != 0;
+	}
+	
+	default boolean notEmpty() 
+	{
+		return size() == 0;
+	}
 }
