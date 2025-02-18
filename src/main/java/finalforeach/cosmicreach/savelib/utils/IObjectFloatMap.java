@@ -5,4 +5,6 @@ public interface IObjectFloatMap<K>
 	float get(K key, float defaultValue);
 
 	void put(K key, float value);
+
+	boolean containsKey(K key);
 }

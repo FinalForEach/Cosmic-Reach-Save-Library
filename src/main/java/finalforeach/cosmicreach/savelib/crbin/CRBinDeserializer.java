@@ -19,27 +19,25 @@ import finalforeach.cosmicreach.savelib.utils.ObjectMaps;
 
 public class CRBinDeserializer
 {
-	private static final IObjectMap<Class<?>, BiFunction<String, CRBinDeserializer, ?>> 
-		defaultClassDeserializers = ObjectMaps.getNew();
-	private IObjectMap<Class<?>, BiFunction<String, CRBinDeserializer, ?>> classDeserializers 
-	= defaultClassDeserializers;
+	private static final IObjectMap<Class<?>, BiFunction<String, CRBinDeserializer, ?>> defaultClassDeserializers = ObjectMaps
+			.getNew();
+	private IObjectMap<Class<?>, BiFunction<String, CRBinDeserializer, ?>> classDeserializers = defaultClassDeserializers;
 
 	private CRBinSchema schema;
 	private IDynamicArray<CRBinSchema> altSchemas;
 	private IDynamicArray<String> strings;
-	private IObjectIntMap<String> intValues = ObjectMaps.getNewIntMap();
-	private IObjectLongMap<String> longValues = ObjectMaps.getNewLongMap();
-	private IObjectFloatMap<String> floatValues = ObjectMaps.getNewFloatMap();
-	private IObjectMap<String, Double> doubleValues = ObjectMaps.getNew();
-	private IObjectMap<String, Object> objValues = ObjectMaps.getNew();
 
+	private IObjectIntMap<String> intValues;
+	private IObjectLongMap<String> longValues;
+	private IObjectFloatMap<String> floatValues;
+	private IObjectMap<String, Object> objValues;
 
-	public static CRBinDeserializer getNew() 
+	public static CRBinDeserializer getNew()
 	{
 		return new CRBinDeserializer();
 	}
 
-	public static CRBinDeserializer fromBase64(String base64) 
+	public static CRBinDeserializer fromBase64(String base64)
 	{
 		CRBinDeserializer deserial = CRBinDeserializer.getNew();
 		var byteBuf = ByteBuffer.wrap(Base64.getDecoder().decode(base64));
@@ -47,27 +45,27 @@ public class CRBinDeserializer
 		return deserial;
 	}
 
-	
-	public static boolean isThereDefaultClassDeserializer(Class<?> clazz) 
+	public static boolean isThereDefaultClassDeserializer(Class<?> clazz)
 	{
 		return defaultClassDeserializers.containsKey(clazz);
 	}
 
-	public static <T> void registerDefaultClassDeserializer(Class<T> clazz, BiFunction<String, CRBinDeserializer, T> func) 
+	public static <T> void registerDefaultClassDeserializer(Class<T> clazz,
+			BiFunction<String, CRBinDeserializer, T> func)
 	{
-		synchronized (defaultClassDeserializers) 
+		synchronized (defaultClassDeserializers)
 		{
-			if(isThereDefaultClassDeserializer(clazz)) 
+			if (isThereDefaultClassDeserializer(clazz))
 			{
 				throw new RuntimeException("Cannot register a default class deserializer twice!");
 			}
-			defaultClassDeserializers.put(clazz, func);	
+			defaultClassDeserializers.put(clazz, func);
 		}
 	}
 
-	public <T> void registerClassDeserializer(Class<?> clazz, BiFunction<String, CRBinDeserializer, T> func) 
+	public <T> void registerClassDeserializer(Class<?> clazz, BiFunction<String, CRBinDeserializer, T> func)
 	{
-		if(classDeserializers == defaultClassDeserializers) 
+		if (classDeserializers == defaultClassDeserializers)
 		{
 			classDeserializers = ObjectMaps.getNew(defaultClassDeserializers);
 		}
@@ -77,30 +75,30 @@ public class CRBinDeserializer
 	private void readSchema(CRBinSchema schema, ByteBuffer bytes)
 	{
 		boolean validSchema = false;
-		schemaRead:
-			while(bytes.hasRemaining()) 
+		schemaRead: while (bytes.hasRemaining())
+		{
+			byte b = bytes.get();
+			var stype = SchemaType.get(b);
+
+			if (stype == SchemaType.SCHEMA_END)
 			{
-				byte b = bytes.get();
-				var stype = SchemaType.get(b);
-
-				if(stype == SchemaType.SCHEMA_END) 
-				{
-					validSchema = true;
-					break schemaRead;
-				}
-
-				String name = ByteArrayUtils.readString(bytes);
-				schema.add(name, stype);
+				validSchema = true;
+				break schemaRead;
 			}
-		if(!validSchema) 
+
+			String name = ByteArrayUtils.readString(bytes);
+			schema.add(name, stype);
+		}
+		if (!validSchema)
 		{
 			throw new RuntimeException("Invalid schema");
 		}
 	}
-	private CRBinDeserializer readObj(ByteBuffer bytes) 
+
+	private CRBinDeserializer readObj(ByteBuffer bytes)
 	{
 		int altSchema = ByteArrayUtils.readInt(bytes);
-		if(altSchema == -1) 
+		if (altSchema == -1)
 		{
 			return null;
 		}
@@ -112,92 +110,157 @@ public class CRBinDeserializer
 		subDeserial.readDataFromSchema(alt, bytes);
 		return subDeserial;
 	}
-	private void readDataFromSchema(CRBinSchema schema, ByteBuffer bytes) 
+
+	private void putObj(String name, Object obj)
+	{
+		if (objValues == null)
+		{
+			objValues = ObjectMaps.getNew();
+		}
+		objValues.put(name, obj);
+	}
+
+	private Object getObj(String name)
+	{
+		if (objValues == null)
+			return null;
+		return objValues.get(name);
+	}
+
+	private void putInt(String name, int i)
+	{
+		if (intValues == null)
+		{
+			intValues = ObjectMaps.getNewIntMap();
+		}
+		intValues.put(name, i);
+	}
+
+	private int getInt(String name, int defaultValue)
+	{
+		if (intValues == null)
+			return defaultValue;
+		return intValues.get(name, defaultValue);
+	}
+
+	private void putFloat(String name, float f)
+	{
+		if (floatValues == null)
+		{
+			floatValues = ObjectMaps.getNewFloatMap();
+		}
+		floatValues.put(name, f);
+	}
+
+	private float getFloat(String name, float defaultValue)
+	{
+		if (floatValues == null)
+			return defaultValue;
+		return floatValues.get(name, defaultValue);
+	}
+
+	private void putLong(String name, long l)
+	{
+		if (longValues == null)
+		{
+			longValues = ObjectMaps.getNewLongMap();
+		}
+		longValues.put(name, l);
+	}
+
+	private long getLong(String name, long defaultValue)
+	{
+		if (longValues == null)
+			return defaultValue;
+		return longValues.get(name, defaultValue);
+	}
+
+	private void readDataFromSchema(CRBinSchema schema, ByteBuffer bytes)
 	{
 		// For each item in the schema,
 		// the schema type tells how to interpret the following byte
 		// into data which is mapped to the name.
-		for(var item : schema.getSchema()) 
+		for (var item : schema.getSchema())
 		{
 			int length;
 			String name = item.name();
-			switch(item.type()) 
+			switch (item.type())
 			{
 			case BOOLEAN:
 			case BYTE:
-				intValues.put(name, ByteArrayUtils.readByte(bytes));
+				putInt(name, ByteArrayUtils.readByte(bytes));
 				break;
 			case DOUBLE:
-				doubleValues.put(name, ByteArrayUtils.readDouble(bytes));
+				putObj(name, ByteArrayUtils.readDouble(bytes));
 				break;
 			case FLOAT:
-				floatValues.put(name, ByteArrayUtils.readFloat(bytes));
+				putFloat(name, ByteArrayUtils.readFloat(bytes));
 				break;
 			case INT:
-				intValues.put(name, ByteArrayUtils.readInt(bytes));
+				putInt(name, ByteArrayUtils.readInt(bytes));
 				break;
 			case LONG:
-				longValues.put(name, ByteArrayUtils.readLong(bytes));
+				putLong(name, ByteArrayUtils.readLong(bytes));
 				break;
 			case SHORT:
-				intValues.put(name, ByteArrayUtils.readShort(bytes));
+				putInt(name, ByteArrayUtils.readShort(bytes));
 				break;
 			case STRING:
 				int stringId = ByteArrayUtils.readInt(bytes);
-				intValues.put(name, stringId);
+				putInt(name, stringId);
 				break;
 			case OBJ:
 				var o = readObj(bytes);
-				objValues.put(name, o);
+				putObj(name, o);
 				break;
 			case OBJ_ARRAY:
 				length = ByteArrayUtils.readInt(bytes);
 				CRBinDeserializer[] subDeserial = new CRBinDeserializer[length];
-				for(int i = 0; i < length; i++) 
+				for (int i = 0; i < length; i++)
 				{
 					subDeserial[i] = readObj(bytes);
 				}
-				objValues.put(name, subDeserial);
+				putObj(name, subDeserial);
 				break;
 			case STRING_ARRAY:
-				readArray(bytes, name, len -> new String[len],
-						(arr, i) -> {arr[i] = strings.get(ByteArrayUtils.readInt(bytes));
-						});
+				readArray(bytes, name, len -> new String[len], (arr, i) -> {
+					arr[i] = strings.get(ByteArrayUtils.readInt(bytes));
+				});
 				break;
 			case BOOLEAN_ARRAY:
-				readArray(bytes, name, len -> new boolean[len],
-						(arr, i) -> {arr[i] = ByteArrayUtils.readByte(bytes) == 1;
-						});
+				readArray(bytes, name, len -> new boolean[len], (arr, i) -> {
+					arr[i] = ByteArrayUtils.readByte(bytes) == 1;
+				});
 				break;
 			case BYTE_ARRAY:
-				readArray(bytes, name, len -> new byte[len],
-						(arr, i) -> {arr[i] = ByteArrayUtils.readByte(bytes);
-						});
+				readArray(bytes, name, len -> new byte[len], (arr, i) -> {
+					arr[i] = ByteArrayUtils.readByte(bytes);
+				});
 				break;
 			case DOUBLE_ARRAY:
-				readArray(bytes, name, len -> new double[len],
-						(arr, i) -> {arr[i] = ByteArrayUtils.readDouble(bytes);
-						});
+				readArray(bytes, name, len -> new double[len], (arr, i) -> {
+					arr[i] = ByteArrayUtils.readDouble(bytes);
+				});
 				break;
 			case FLOAT_ARRAY:
-				readArray(bytes, name, len -> new float[len],
-						(arr, i) -> {arr[i] = ByteArrayUtils.readFloat(bytes);
-						});
+				readArray(bytes, name, len -> new float[len], (arr, i) -> {
+					arr[i] = ByteArrayUtils.readFloat(bytes);
+				});
 				break;
 			case INT_ARRAY:
-				readArray(bytes, name, len -> new int[len],
-						(arr, i) -> {arr[i] = ByteArrayUtils.readInt(bytes);
-						});
+				readArray(bytes, name, len -> new int[len], (arr, i) -> {
+					arr[i] = ByteArrayUtils.readInt(bytes);
+				});
 				break;
 			case LONG_ARRAY:
-				readArray(bytes, name, len -> new long[len],
-						(arr, i) -> {arr[i] = ByteArrayUtils.readLong(bytes);
-						});
+				readArray(bytes, name, len -> new long[len], (arr, i) -> {
+					arr[i] = ByteArrayUtils.readLong(bytes);
+				});
 				break;
 			case SHORT_ARRAY:
-				readArray(bytes, name, len -> new short[len],
-						(arr, i) -> {arr[i] = ByteArrayUtils.readShort(bytes);
-						});
+				readArray(bytes, name, len -> new short[len], (arr, i) -> {
+					arr[i] = ByteArrayUtils.readShort(bytes);
+				});
 				break;
 			default:
 				break;
@@ -205,67 +268,66 @@ public class CRBinDeserializer
 			}
 		}
 	}
-	private <T> void readArray(ByteBuffer bytes, String name,
-			IntFunction<T> arrCreator, 
-			ObjIntConsumer<T> perElement) 
+
+	private <T> void readArray(ByteBuffer bytes, String name, IntFunction<T> arrCreator, ObjIntConsumer<T> perElement)
 	{
 		int length = ByteArrayUtils.readInt(bytes);
-		if(length == -1) 
+		if (length == -1)
 		{
-			objValues.put(name, null);
-		}else 
+			putObj(name, null);
+		} else
 		{
 			T arr = arrCreator.apply(length);
-			for(int i = 0; i < length; i++) 
+			for (int i = 0; i < length; i++)
 			{
 				perElement.accept(arr, i);
 			}
-			
-			objValues.put(name, arr);
+
+			putObj(name, arr);
 		}
 	}
 
-	public String[] readStringArray(String name) 
+	public String[] readStringArray(String name)
 	{
-		return (String[]) objValues.get(name);
+		return (String[]) getObj(name);
 	}
 
-	public boolean[] readBooleanArray(String name) 
+	public boolean[] readBooleanArray(String name)
 	{
-		return (boolean[]) objValues.get(name);
+		return (boolean[]) getObj(name);
 	}
 
-	public byte[] readByteArray(String name) 
+	public byte[] readByteArray(String name)
 	{
-		return (byte[]) objValues.get(name);
+		return (byte[]) getObj(name);
 	}
 
-	public short[] readShortArray(String name) 
+	public short[] readShortArray(String name)
 	{
-		return (short[]) objValues.get(name);
+		return (short[]) getObj(name);
 	}
 
-	public int[] readIntArray(String name) 
+	public int[] readIntArray(String name)
 	{
-		return (int[]) objValues.get(name);
+		return (int[]) getObj(name);
 	}
 
-	public long[] readLongArray(String name) 
+	public long[] readLongArray(String name)
 	{
-		return (long[]) objValues.get(name);
+		return (long[]) getObj(name);
 	}
 
-	public float[] readFloatArray(String name) 
+	public float[] readFloatArray(String name)
 	{
-		return (float[]) objValues.get(name);
+		return (float[]) getObj(name);
 	}
 
-	public double[] readDoubleArray(String name) 
+	public double[] readDoubleArray(String name)
 	{
-		return (double[]) objValues.get(name);
+		return (double[]) getObj(name);
 	}
 
-	public void prepareForRead(ByteBuffer bytes) 
+	public void prepareForRead(ByteBuffer bytes)
 	{
 		schema = new CRBinSchema();
 		altSchemas = DynamicArrays.getNew(CRBinSchema.class);
@@ -273,7 +335,7 @@ public class CRBinDeserializer
 		int numStrings = ByteArrayUtils.readInt(bytes);
 		strings = DynamicArrays.getNew(String.class, numStrings);
 
-		for(int i = 0; i < numStrings; i++) 
+		for (int i = 0; i < numStrings; i++)
 		{
 			strings.add(ByteArrayUtils.readString(bytes));
 		}
@@ -282,7 +344,7 @@ public class CRBinDeserializer
 		readSchema(schema, bytes);
 		// Now read alt schemas
 		int numAlt = ByteArrayUtils.readInt(bytes);
-		for(int i = 0; i < numAlt; i++) 
+		for (int i = 0; i < numAlt; i++)
 		{
 			var alt = new CRBinSchema();
 			readSchema(alt, bytes);
@@ -292,38 +354,41 @@ public class CRBinDeserializer
 		readDataFromSchema(schema, bytes);
 	}
 
-	public int readInt(String name, int defaultValue) 
+	public int readInt(String name, int defaultValue)
 	{
-		return intValues.get(name, defaultValue);
+		return getInt(name, defaultValue);
 	}
 
-	public long readLong(String name, long defaultValue) 
+	public long readLong(String name, long defaultValue)
 	{
-		return longValues.get(name, defaultValue);
+		return getLong(name, defaultValue);
 	}
 
-	public short readShort(String name, short defaultValue) 
+	public short readShort(String name, short defaultValue)
 	{
-		return (short) intValues.get(name, defaultValue);
+		return (short) getInt(name, defaultValue);
 	}
 
-	public float readFloat(String name, float defaultValue) 
+	public float readFloat(String name, float defaultValue)
 	{
-		return floatValues.get(name, defaultValue);
+		return getFloat(name, defaultValue);
 	}
 
-	public boolean readBoolean(String name, boolean defaultValue) 
+	public boolean readBoolean(String name, boolean defaultValue)
 	{
-		boolean b = intValues.get(name, defaultValue? 1 : 0) == 1;		
+		boolean b = getInt(name, defaultValue ? 1 : 0) == 1;
 		return b;
 	}
+
 	public String readString(String name)
 	{
-		int stringId = intValues.get(name, -1);
-		if(stringId==-1)return null;
+		int stringId = getInt(name, -1);
+		if (stringId == -1)
+			return null;
 		String s = strings.get(stringId);
 		return s;
 	}
+
 	private <T extends ICRBinSerializable> T readObj(Class<T> elementType, CRBinDeserializer d)
 	{
 		T t = newInstance(elementType);
@@ -331,103 +396,114 @@ public class CRBinDeserializer
 		return t;
 	}
 
+	public boolean hasValue(String name)
+	{
+		return (intValues != null && intValues.containsKey(name))
+				|| (longValues != null && longValues.containsKey(name))
+				|| (floatValues != null && floatValues.containsKey(name))
+				|| (objValues != null && objValues.containsKey(name));
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T> T readObj(String name, Class<T> elementType)
 	{
 		var func = classDeserializers.get(elementType);
-		if(func != null) 
+		if (func != null)
 		{
-			return (T)func.apply(name, this);
+			return (T) func.apply(name, this);
 		}
-		var d = (CRBinDeserializer) objValues.get(name);
-		if(d == null) 
+		var d = (CRBinDeserializer) getObj(name);
+		if (d == null)
 		{
 			return null;
 		}
-		if(ICRBinSerializable.class.isAssignableFrom(elementType))
+		if (ICRBinSerializable.class.isAssignableFrom(elementType))
 		{
-			return (T) readObj((Class<ICRBinSerializable>)elementType, d);	
+			return (T) readObj((Class<ICRBinSerializable>) elementType, d);
 		}
-		throw new RuntimeException(elementType.getSimpleName() 
+		throw new RuntimeException(elementType.getSimpleName()
 				+ " neither has an associated class deserializer, nor is derived from ICosmicReachBinarySerializable!");
 	}
 
-	public CRBinDeserializer readRawObj(String name) 
+	public CRBinDeserializer readRawObj(String name)
 	{
-		var backing = (CRBinDeserializer) objValues.get(name);
-		return backing;
-	}
-	public CRBinDeserializer[] readRawObjArray(String name) 
-	{
-		var backing = (CRBinDeserializer[]) objValues.get(name);
+		var backing = (CRBinDeserializer) getObj(name);
 		return backing;
 	}
 
-	public <T extends ICRBinSerializable> IDynamicArray<T> readObjArray(String name, Class<T> elementType) 
+	public CRBinDeserializer[] readRawObjArray(String name)
 	{
-		var backing = (CRBinDeserializer[]) objValues.get(name);
+		var backing = (CRBinDeserializer[]) getObj(name);
+		return backing;
+	}
+
+	public <T extends ICRBinSerializable> IDynamicArray<T> readObjArray(String name, Class<T> elementType)
+	{
+		var backing = (CRBinDeserializer[]) getObj(name);
 		IDynamicArray<T> arr = DynamicArrays.getNew(elementType, backing.length);
-		for(var d : backing) 
+		for (var d : backing)
 		{
 			arr.add(d != null ? readObj(elementType, d) : null);
 		}
 		return arr;
 	}
 
-	private <T extends ICRBinSerializable> T newInstance(Class<T> type) 
+	private <T extends ICRBinSerializable> T newInstance(Class<T> type)
 	{
-		try 
+		try
 		{
 			var c = type.getDeclaredConstructor();
 			c.setAccessible(true);
 			return (T) c.newInstance();
-		} catch (NoSuchMethodException | SecurityException | InstantiationException 
-				| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) 
+		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException e)
 		{
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
 
-	public void autoRead(Object obj) 
+	public void autoRead(Object obj)
 	{
 		Class<?> clazz = obj.getClass();
-		
-		while(clazz != Object.class) 
+
+		while (clazz != Object.class)
 		{
 			var fields = clazz.getDeclaredFields();
-			
-			for(Field field : fields) 
+
+			for (Field field : fields)
 			{
-				if(field.isAnnotationPresent(CRBSerialized.class)) 
+				if (field.isAnnotationPresent(CRBSerialized.class))
 				{
 					field.setAccessible(true);
-					try 
+					try
 					{
 						String name = field.getName();
+						if(!hasValue(name)) 
+						{
+							continue;
+						}
 						var type = field.getType();
-						if(type == int.class) 
+						if (type == int.class)
 						{
 							field.set(obj, readInt(name, field.getInt(obj)));
-						}
-						else if(type == float.class) 
+						} else if (type == float.class)
 						{
 							field.set(obj, readFloat(name, field.getFloat(obj)));
-						}else if(type == boolean.class) 
+						} else if (type == boolean.class)
 						{
 							field.set(obj, readBoolean(name, field.getBoolean(obj)));
-						}else if(type == String.class)
+						} else if (type == String.class)
 						{
 							field.set(obj, readString(name));
-						}else if(!type.isPrimitive()) 
+						} else if (!type.isPrimitive())
 						{
 							field.set(obj, readObj(name, type));
-						}
-						else
+						} else
 						{
 							throw new RuntimeException("Not yet implemented for type: " + type.getSimpleName());
 						}
-					} catch (IllegalArgumentException | IllegalAccessException e) 
+					} catch (IllegalArgumentException | IllegalAccessException e)
 					{
 						e.printStackTrace();
 					}
