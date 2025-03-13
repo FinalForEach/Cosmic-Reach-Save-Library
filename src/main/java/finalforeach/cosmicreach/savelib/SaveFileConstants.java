@@ -5,7 +5,7 @@ public class SaveFileConstants
 {
 	// [F]inal[F]or[E]ach [C]osmi[c]r[eac]h
 	public static final int MAGIC = 0xFFECCEAC;
-	public static final int FILE_VERSION = 2; // TODO: Upgrade to 3 when adding LZ4 properly
+	public static final int FILE_VERSION = 3; // TODO: Upgrade to 4 when adding LZ4 properly
 	public static final int COMPRESSION_TYPE_NONE = 0;
 	public static final int COMPRESSION_TYPE_LZ4 = 1;
 
