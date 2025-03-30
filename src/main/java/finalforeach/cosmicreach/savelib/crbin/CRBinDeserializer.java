@@ -479,7 +479,7 @@ public class CRBinDeserializer
 					try
 					{
 						String name = field.getName();
-						if(!hasValue(name)) 
+						if (!hasValue(name))
 						{
 							continue;
 						}
@@ -487,6 +487,9 @@ public class CRBinDeserializer
 						if (type == int.class)
 						{
 							field.set(obj, readInt(name, field.getInt(obj)));
+						} else if (type == long.class)
+						{
+							field.set(obj, readLong(name, field.getLong(obj)));
 						} else if (type == float.class)
 						{
 							field.set(obj, readFloat(name, field.getFloat(obj)));
