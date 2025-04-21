@@ -5,25 +5,27 @@ import finalforeach.cosmicreach.savelib.ISavedChunk;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.lightdata.skylight.layers.ISkylightDataLayer;
 import finalforeach.cosmicreach.savelib.lightdata.skylight.layers.SkylightDataSingleLayer;
+import static finalforeach.cosmicreach.savelib.ISavedChunk.CHUNK_WIDTH;
 
 public class SkylightLayeredData implements ISkylightData
 {
 	private ISkylightDataLayer[] layers = new ISkylightDataLayer[CHUNK_WIDTH];
-	
-	public SkylightLayeredData() 
+
+	public SkylightLayeredData()
 	{
-		this((byte)0);
+		this((byte) 0);
 	}
+
 	public SkylightLayeredData(byte skylightValue)
 	{
-		for(int i = 0; i < layers.length; i++)
+		for (int i = 0; i < layers.length; i++)
 		{
 			layers[i] = SkylightDataSingleLayer.getForLightValue(skylightValue);
 		}
 	}
 
 	@Override
-	public int getSkyLight(int localX, int localY, int localZ) 
+	public int getSkyLight(int localX, int localY, int localZ)
 	{
 		return layers[localY].getSkyLight(localX, localZ);
 	}
@@ -34,30 +36,34 @@ public class SkylightLayeredData implements ISkylightData
 		layers[localY].setSkyLight(this, lightLevel, localX, localY, localZ);
 	}
 
-	public void setLayer(int yLevel, ISkylightDataLayer skyLightLayer) {
+	public void setLayer(int yLevel, ISkylightDataLayer skyLightLayer)
+	{
 		layers[yLevel] = skyLightLayer;
 	}
 
-	public ISkylightDataLayer getLayer(int yLevel) 
+	public ISkylightDataLayer getLayer(int yLevel)
 	{
 		return layers[yLevel];
 	}
-	public ISkylightDataLayer[] getLayers() {
+
+	public ISkylightDataLayer[] getLayers()
+	{
 		return layers;
 	}
-	
+
 	@Override
-	public int getSaveFileConstant() 
+	public int getSaveFileConstant()
 	{
 		return SaveFileConstants.SKYLIGHTDATA_LAYERED;
 	}
+
 	@Override
 	public void writeTo(IChunkByteWriter allChunksWriter)
 	{
-		for(var layer : getLayers()) 
+		for (var layer : getLayers())
 		{
 			allChunksWriter.writeByte(layer.getSaveFileConstant());
 			layer.writeTo(allChunksWriter);
-		}		
+		}
 	}
 }
