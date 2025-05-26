@@ -8,4 +8,3 @@
  */
 
 rootProject.name = 'Cosmic-Reach-Save-Library'
-include('lib')
