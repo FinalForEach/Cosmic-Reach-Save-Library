@@ -9,27 +9,28 @@ import finalforeach.cosmicreach.savelib.utils.RawByteArrayUtils;
 
 public class CRBinSchema
 {
-	public record SchemaItem(String name, SchemaType type) {}
+	public record SchemaItem(String name, SchemaType type)
+	{}
 
 	private IDynamicArray<SchemaItem> schema = DynamicArrays.getNew(SchemaItem.class);
 
 	public void add(String name, SchemaType type)
 	{
-		if(name==null) 
+		if (name == null)
 		{
 			return;
 		}
 
-		for(int i = 0; i < schema.size(); i++)
+		for (int i = 0; i < schema.size(); i++)
 		{
 			var s = schema.get(i);
-			if(s.name.equalsIgnoreCase(name))
+			if (s.name.equalsIgnoreCase(name))
 			{
 				throw new RuntimeException("Duplicate name in schema: " + name);
 			}
 		}
 		var item = new SchemaItem(name, type);
-		schema.add(item);		
+		schema.add(item);
 	}
 
 	public Iterable<SchemaItem> getSchema()
@@ -41,26 +42,26 @@ public class CRBinSchema
 	{
 		int byteCount = 0;
 
-		for(var item : schema)
+		for (var item : schema)
 		{
 			byteCount++; // For the schema item type
-			byteCount+=Integer.BYTES; // For the string length or null specifier
-			if(item.name!=null) 
+			byteCount += Integer.BYTES; // For the string length or null specifier
+			if (item.name != null)
 			{
-				byteCount+=item.name.getBytes(StandardCharsets.UTF_8).length; // the string's bytes
+				byteCount += item.name.getBytes(StandardCharsets.UTF_8).length; // the string's bytes
 			}
 		}
 		byteCount++; // For schema end
 
 		byte[] bytes = new byte[byteCount];
 		int byteIdx = 0;
-		for(var item : schema)
+		for (var item : schema)
 		{
 			// Write the schema item type byte
 			byteIdx = RawByteArrayUtils.writeByte(byteIdx, bytes, item.type.byteId);
-			
+
 			// Write the name of the schema item
-			byteIdx = RawByteArrayUtils.writeString(byteIdx, bytes, item.name);	
+			byteIdx = RawByteArrayUtils.writeString(byteIdx, bytes, item.name);
 		}
 
 		// Write the ending byte, the schema is done after this!
@@ -85,12 +86,12 @@ public class CRBinSchema
 		CRBinSchema other = (CRBinSchema) obj;
 		return Objects.equals(schema, other.schema);
 	}
-	
+
 	@Override
-	public String toString() 
+	public String toString()
 	{
 		StringBuilder sb = new StringBuilder("[");
-		for(var s : schema) 
+		for (var s : schema)
 		{
 			sb.append(s.name);
 			sb.append(":");

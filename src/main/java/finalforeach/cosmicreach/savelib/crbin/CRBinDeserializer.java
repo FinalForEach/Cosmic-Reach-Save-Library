@@ -143,6 +143,16 @@ public class CRBinDeserializer
 		return intValues.get(name, defaultValue);
 	}
 
+	public boolean hasInt(String name)
+	{
+		return intValues != null && intValues.containsKey(name);
+	}
+
+	public boolean hasFloat(String name)
+	{
+		return floatValues != null && floatValues.containsKey(name);
+	}
+
 	private void putFloat(String name, float f)
 	{
 		if (floatValues == null)
@@ -157,6 +167,13 @@ public class CRBinDeserializer
 		if (floatValues == null)
 			return defaultValue;
 		return floatValues.get(name, defaultValue);
+	}
+
+	private double getDouble(String name, double defaultValue)
+	{
+		if (longValues == null)
+			return defaultValue;
+		return Double.longBitsToDouble(longValues.get(name, Double.doubleToRawLongBits(defaultValue)));
 	}
 
 	private void putLong(String name, long l)
@@ -372,6 +389,11 @@ public class CRBinDeserializer
 	public float readFloat(String name, float defaultValue)
 	{
 		return getFloat(name, defaultValue);
+	}
+
+	public double readDouble(String name, double defaultValue)
+	{
+		return getDouble(name, defaultValue);
 	}
 
 	public boolean readBoolean(String name, boolean defaultValue)
