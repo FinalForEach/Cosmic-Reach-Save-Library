@@ -115,4 +115,10 @@ public class SingleBlockData<T> implements IBlockData<T>
 		return this.blockValue == value;
 	}
 
+	@Override
+	public boolean hasValueInPalette(Predicate<T> valueTest)
+	{
+		return blockValue!=null && valueTest.test(blockValue);
+	}
+
 }

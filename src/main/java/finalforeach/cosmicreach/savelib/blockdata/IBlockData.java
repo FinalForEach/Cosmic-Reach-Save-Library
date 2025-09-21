@@ -1,5 +1,6 @@
 package finalforeach.cosmicreach.savelib.blockdata;
 
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import finalforeach.cosmicreach.savelib.IChunkByteWriter;
@@ -31,5 +32,7 @@ public interface IBlockData<T> extends ISaveFileConstant
 	public void writeTo(IChunkByteWriter allChunksWriter);
 
 	public boolean hasValueInPalette(T value);
+
+	public boolean hasValueInPalette(Predicate<T> valueTest);
 
 }
