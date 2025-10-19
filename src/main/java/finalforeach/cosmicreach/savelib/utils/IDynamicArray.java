@@ -39,4 +39,6 @@ public interface IDynamicArray<E> extends Iterable<E>
 	{
 		return size() == 0;
 	}
+
+	void truncate(int numberOfSlots);
 }
