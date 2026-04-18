@@ -1,6 +1,5 @@
 package finalforeach.cosmicreach.savelib.tests;
 
-import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.ByteBuffer;
@@ -79,6 +78,13 @@ class TestDynamicArray<T> implements IDynamicArray<T>
 	public T removeIndex(int index) {
 		return backingArray.remove(index);
 	}
+
+	@Override
+	public void truncate(int numberOfSlots) {
+		while (backingArray.size() > numberOfSlots) {
+			backingArray.remove(backingArray.size() - 1);
+		}
+	}
 	@Override
 	public String toString() {
 		String s = "[";
@@ -151,6 +157,11 @@ class TestObjectLongMap<K> implements IObjectLongMap<K>
 	}
 
 	@Override
+	public boolean containsKey(K key) {
+		return map.containsKey(key);
+	}
+
+	@Override
 	public void put(K key, long value) {
 		map.put(key, value);
 	}
@@ -164,6 +175,11 @@ class TestObjectIntMap<K> implements IObjectIntMap<K>
 	}
 
 	@Override
+	public boolean containsKey(K key) {
+		return map.containsKey(key);
+	}
+
+	@Override
 	public void put(K key, int value) {
 		map.put(key, value);
 	}
@@ -174,6 +190,11 @@ class TestObjectFloatMap<K> implements IObjectFloatMap<K>
 	@Override
 	public float get(K key, float defaultValue) {
 		return map.getOrDefault(key, defaultValue);
+	}
+
+	@Override
+	public boolean containsKey(K key) {
+		return map.containsKey(key);
 	}
 
 	@Override
@@ -267,7 +288,6 @@ public class CRBinTests
 				return new TestDynamicArray<E>();
 			}
 		};
-		DynamicArrays.instantiator = null;
 		ObjectMaps.instantiator = new IObjectMapInstantiator() {
 			
 			@Override

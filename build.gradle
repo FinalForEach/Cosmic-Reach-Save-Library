@@ -25,3 +25,11 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+sourceSets {
+    test {
+        java {
+            srcDirs = ['tests']
+        }
+    }
+}
