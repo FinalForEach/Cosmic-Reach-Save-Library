@@ -12,7 +12,7 @@ public class SkylightDataNibbleLayer implements ISkylightDataLayer
 	{
 		for(int i = 0; i < lightLevels.length; i++) 
 		{
-			lightLevels[i] = lightLevel;
+			lightLevels[i] = (byte) ((lightLevel << 4) | (lightLevel & 0x0F));
 		}
 	}
 
