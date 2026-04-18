@@ -4,7 +4,7 @@ public class SaveFileConstants
 {
 	// [F]inal[F]or[E]ach [C]osmi[c]r[eac]h
 	public static final int MAGIC = 0xFFECCEAC;
-	public static final int FILE_VERSION = 5;
+	public static final int FILE_VERSION = 6;
 	public static final int COMPRESSION_TYPE_NONE = 0;
 	public static final int COMPRESSION_TYPE_LZ4 = 1;
 	public static final int COMPRESSION_TYPE_GZIP = 2;
