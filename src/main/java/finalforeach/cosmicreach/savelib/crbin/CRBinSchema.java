@@ -9,8 +9,48 @@ import finalforeach.cosmicreach.savelib.utils.RawByteArrayUtils;
 
 public class CRBinSchema
 {
-	public record SchemaItem(String name, SchemaType type)
-	{}
+	public static final class SchemaItem
+	{
+		public final String name;
+		public final SchemaType type;
+
+		public SchemaItem(String name, SchemaType type)
+		{
+			this.name = name;
+			this.type = type;
+		}
+
+		public String name()
+		{
+			return name;
+		}
+
+		public SchemaType type()
+		{
+			return type;
+		}
+
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (this == obj) return true;
+			if (obj == null || getClass() != obj.getClass()) return false;
+			SchemaItem other = (SchemaItem) obj;
+			return Objects.equals(name, other.name) && Objects.equals(type, other.type);
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return Objects.hash(name, type);
+		}
+
+		@Override
+		public String toString()
+		{
+			return "SchemaItem[name=" + name + ", type=" + type + "]";
+		}
+	}
 
 	private IDynamicArray<SchemaItem> schema = DynamicArrays.getNew(SchemaItem.class);
 
