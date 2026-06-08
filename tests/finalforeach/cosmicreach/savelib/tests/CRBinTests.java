@@ -146,6 +146,11 @@ class TestByteArray implements IByteArray
 	public byte[] items() {
 		return backingArray;
 	}
+
+	@Override
+	public void clear() {
+		size = 0;
+	}
 }
 
 class TestObjectLongMap<K> implements IObjectLongMap<K>

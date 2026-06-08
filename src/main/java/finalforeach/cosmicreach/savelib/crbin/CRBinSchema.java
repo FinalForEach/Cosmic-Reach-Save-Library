@@ -54,6 +54,11 @@ public class CRBinSchema
 
 	private IDynamicArray<SchemaItem> schema = DynamicArrays.getNew(SchemaItem.class);
 
+	public void clear()
+	{
+		schema.clear();
+	}
+
 	public void add(String name, SchemaType type)
 	{
 		if (name == null)

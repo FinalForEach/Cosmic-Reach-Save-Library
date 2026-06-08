@@ -17,4 +17,6 @@ public interface IByteArray
 
 	byte[] items();
 
+	void clear();
+
 }

@@ -54,16 +54,23 @@ public class CRBinSerializer
 		classSerializers.put(clazz, consumer);
 	}
 
+	public void reset()
+	{
+		schema.clear();
+		altSchemas.clear();
+		strings.clear();
+		bytes.clear();
+		classSerializers = defaultClassSerializers;
+	}
+
 	public byte[] toBytes()
 	{
 		return toByteArray().toArray();
 	}
 
-	public IByteArray toByteArray()
+	public void writeToByteArray(IByteArray bytesToWrite)
 	{
-		IByteArray bytesToWrite = DynamicArrays.getNewByteArray();
 		// First write all common strings
-
 		ByteArrayUtils.writeInt(bytesToWrite, strings.size());
 		for (String s : strings)
 		{
@@ -71,11 +78,9 @@ public class CRBinSerializer
 		}
 
 		// Then write the bytes of the current schema
-
 		bytesToWrite.addAll(schema.getBytes());
 
 		// Then write the bytes of the other schemas
-
 		ByteArrayUtils.writeInt(bytesToWrite, altSchemas.size());
 		for (var s : altSchemas)
 		{
@@ -84,7 +89,12 @@ public class CRBinSerializer
 
 		// Then write the binary data
 		bytesToWrite.addAll(bytes);
+	}
 
+	public IByteArray toByteArray()
+	{
+		IByteArray bytesToWrite = DynamicArrays.getNewByteArray();
+		writeToByteArray(bytesToWrite);
 		return bytesToWrite;
 	}
 
