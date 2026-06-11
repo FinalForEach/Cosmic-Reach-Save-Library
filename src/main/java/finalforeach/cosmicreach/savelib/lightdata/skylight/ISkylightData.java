@@ -1,5 +1,7 @@
 package finalforeach.cosmicreach.savelib.lightdata.skylight;
 
+import static finalforeach.cosmicreach.savelib.ISavedChunk.CHUNK_WIDTH;
+
 import java.io.IOException;
 
 import finalforeach.cosmicreach.savelib.IChunkByteReader;
@@ -9,7 +11,6 @@ import finalforeach.cosmicreach.savelib.ISavedChunk;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.lightdata.skylight.layers.SkylightDataNibbleLayer;
 import finalforeach.cosmicreach.savelib.lightdata.skylight.layers.SkylightDataSingleLayer;
-import static finalforeach.cosmicreach.savelib.ISavedChunk.CHUNK_WIDTH;
 
 public interface ISkylightData extends ISaveFileConstant
 {

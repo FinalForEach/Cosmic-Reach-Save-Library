@@ -1,5 +1,7 @@
 package finalforeach.cosmicreach.savelib.lightdata.blocklight;
 
+import static finalforeach.cosmicreach.savelib.ISavedChunk.CHUNK_WIDTH;
+
 import java.io.IOException;
 
 import finalforeach.cosmicreach.savelib.IChunkByteReader;
@@ -7,7 +9,6 @@ import finalforeach.cosmicreach.savelib.IChunkByteWriter;
 import finalforeach.cosmicreach.savelib.ISaveFileConstant;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.lightdata.blocklight.layers.IBlockLightLayer;
-import static finalforeach.cosmicreach.savelib.ISavedChunk.CHUNK_WIDTH;
 
 public interface IBlockLightData extends ISaveFileConstant
 {

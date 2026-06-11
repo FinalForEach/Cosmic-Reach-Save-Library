@@ -8,7 +8,6 @@ import finalforeach.cosmicreach.savelib.lightdata.blocklight.layers.BlockLightMo
 import finalforeach.cosmicreach.savelib.lightdata.blocklight.layers.BlockLightMonoRedNibbleLayer;
 import finalforeach.cosmicreach.savelib.lightdata.blocklight.layers.BlockLightShortLayer;
 import finalforeach.cosmicreach.savelib.lightdata.blocklight.layers.BlockLightSingleLayer;
-import finalforeach.cosmicreach.savelib.lightdata.blocklight.layers.IBlockLightLayer;
 import finalforeach.cosmicreach.savelib.lightdata.skylight.ISkylightData;
 import finalforeach.cosmicreach.savelib.lightdata.skylight.SkylightLayeredData;
 import finalforeach.cosmicreach.savelib.lightdata.skylight.SkylightSingleData;

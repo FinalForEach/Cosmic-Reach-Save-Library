@@ -1,11 +1,12 @@
 package finalforeach.cosmicreach.savelib.lightdata.skylight;
 
+import static finalforeach.cosmicreach.savelib.ISavedChunk.CHUNK_WIDTH;
+
 import finalforeach.cosmicreach.savelib.IChunkByteWriter;
 import finalforeach.cosmicreach.savelib.ISavedChunk;
 import finalforeach.cosmicreach.savelib.SaveFileConstants;
 import finalforeach.cosmicreach.savelib.lightdata.skylight.layers.ISkylightDataLayer;
 import finalforeach.cosmicreach.savelib.lightdata.skylight.layers.SkylightDataSingleLayer;
-import static finalforeach.cosmicreach.savelib.ISavedChunk.CHUNK_WIDTH;
 
 public class SkylightLayeredData implements ISkylightData
 {

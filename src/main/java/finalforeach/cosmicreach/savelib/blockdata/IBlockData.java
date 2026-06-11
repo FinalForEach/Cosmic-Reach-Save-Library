@@ -1,6 +1,5 @@
 package finalforeach.cosmicreach.savelib.blockdata;
 
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import finalforeach.cosmicreach.savelib.IChunkByteWriter;

@@ -1,7 +1,9 @@
 package finalforeach.cosmicreach.savelib.tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
+
 import finalforeach.cosmicreach.savelib.lightdata.skylight.layers.SkylightDataNibbleLayer;
 
 public class SkylightNibbleTests
