@@ -3,6 +3,7 @@ package finalforeach.cosmicreach.savelib.crbin;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.function.BiFunction;
 import java.util.function.IntFunction;
@@ -23,6 +24,7 @@ public class CRBinDeserializer
 			.getNew();
 	private IObjectMap<Class<?>, BiFunction<String, CRBinDeserializer, ?>> classDeserializers = defaultClassDeserializers;
 
+	private int version = 1;
 	private CRBinSchema schema;
 	private IDynamicArray<CRBinSchema> altSchemas;
 	private IDynamicArray<String> strings;
@@ -86,7 +88,16 @@ public class CRBinDeserializer
 				break schemaRead;
 			}
 
-			String name = ByteArrayUtils.readString(bytes);
+			String name;
+			if (version == 2)
+			{
+				int stringId = ByteArrayUtils.readVarInt(bytes);
+				name = strings.get(stringId);
+			}
+			else
+			{
+				name = ByteArrayUtils.readString(bytes);
+			}
 			schema.add(name, stype);
 		}
 		if (!validSchema)
@@ -97,13 +108,14 @@ public class CRBinDeserializer
 
 	private CRBinDeserializer readObj(ByteBuffer bytes)
 	{
-		int altSchema = ByteArrayUtils.readInt(bytes);
+		int altSchema = version == 2 ? ByteArrayUtils.readVarInt(bytes) : ByteArrayUtils.readInt(bytes);
 		if (altSchema == -1)
 		{
 			return null;
 		}
 		var alt = altSchemas.get(altSchema);
 		CRBinDeserializer subDeserial = CRBinDeserializer.getNew();
+		subDeserial.version = version;
 		subDeserial.classDeserializers = classDeserializers;
 		subDeserial.altSchemas = altSchemas;
 		subDeserial.strings = strings;
@@ -214,7 +226,7 @@ public class CRBinDeserializer
 				putFloat(name, ByteArrayUtils.readFloat(bytes));
 				break;
 			case INT:
-				putInt(name, ByteArrayUtils.readInt(bytes));
+				putInt(name, version == 2 ? ByteArrayUtils.readVarInt(bytes) : ByteArrayUtils.readInt(bytes));
 				break;
 			case LONG:
 				putLong(name, ByteArrayUtils.readLong(bytes));
@@ -223,7 +235,7 @@ public class CRBinDeserializer
 				putInt(name, ByteArrayUtils.readShort(bytes));
 				break;
 			case STRING:
-				int stringId = ByteArrayUtils.readInt(bytes);
+				int stringId = version == 2 ? ByteArrayUtils.readVarInt(bytes) : ByteArrayUtils.readInt(bytes);
 				putInt(name, stringId);
 				break;
 			case OBJ:
@@ -231,7 +243,7 @@ public class CRBinDeserializer
 				putObj(name, o);
 				break;
 			case OBJ_ARRAY:
-				length = ByteArrayUtils.readInt(bytes);
+				length = version == 2 ? ByteArrayUtils.readVarInt(bytes) : ByteArrayUtils.readInt(bytes);
 				CRBinDeserializer[] subDeserial = new CRBinDeserializer[length];
 				for (int i = 0; i < length; i++)
 				{
@@ -241,13 +253,42 @@ public class CRBinDeserializer
 				break;
 			case STRING_ARRAY:
 				readArray(bytes, name, len -> new String[len], (arr, i) -> {
-					arr[i] = strings.get(ByteArrayUtils.readInt(bytes));
+					arr[i] = strings.get(version == 2 ? ByteArrayUtils.readVarInt(bytes) : ByteArrayUtils.readInt(bytes));
 				});
 				break;
 			case BOOLEAN_ARRAY:
-				readArray(bytes, name, len -> new boolean[len], (arr, i) -> {
-					arr[i] = ByteArrayUtils.readByte(bytes) == 1;
-				});
+				if (version == 2)
+				{
+					int len = ByteArrayUtils.readVarInt(bytes);
+					if (len == -1)
+					{
+						putObj(name, null);
+					}
+					else
+					{
+						boolean[] arr = new boolean[len];
+						int numBytes = (len + 7) / 8;
+						for (int bIdx = 0; bIdx < numBytes; bIdx++)
+						{
+							byte b = ByteArrayUtils.readByte(bytes);
+							for (int bit = 0; bit < 8; bit++)
+							{
+								int arrIdx = bIdx * 8 + bit;
+								if (arrIdx < len)
+								{
+									arr[arrIdx] = (b & (1 << bit)) != 0;
+								}
+							}
+						}
+						putObj(name, arr);
+					}
+				}
+				else
+				{
+					readArray(bytes, name, len -> new boolean[len], (arr, i) -> {
+						arr[i] = ByteArrayUtils.readByte(bytes) == 1;
+					});
+				}
 				break;
 			case BYTE_ARRAY:
 				readArray(bytes, name, len -> new byte[len], (arr, i) -> {
@@ -266,7 +307,7 @@ public class CRBinDeserializer
 				break;
 			case INT_ARRAY:
 				readArray(bytes, name, len -> new int[len], (arr, i) -> {
-					arr[i] = ByteArrayUtils.readInt(bytes);
+					arr[i] = version == 2 ? ByteArrayUtils.readVarInt(bytes) : ByteArrayUtils.readInt(bytes);
 				});
 				break;
 			case LONG_ARRAY:
@@ -288,7 +329,7 @@ public class CRBinDeserializer
 
 	private <T> void readArray(ByteBuffer bytes, String name, IntFunction<T> arrCreator, ObjIntConsumer<T> perElement)
 	{
-		int length = ByteArrayUtils.readInt(bytes);
+		int length = version == 2 ? ByteArrayUtils.readVarInt(bytes) : ByteArrayUtils.readInt(bytes);
 		if (length == -1)
 		{
 			putObj(name, null);
@@ -348,25 +389,89 @@ public class CRBinDeserializer
 	{
 		schema = new CRBinSchema();
 		altSchemas = DynamicArrays.getNew(CRBinSchema.class);
-		// Read strings
-		int numStrings = ByteArrayUtils.readInt(bytes);
-		strings = DynamicArrays.getNew(String.class, numStrings);
 
-		for (int i = 0; i < numStrings; i++)
+		// Check signature
+		if (bytes.remaining() >= 4)
 		{
-			strings.add(ByteArrayUtils.readString(bytes));
+			bytes.mark();
+			byte b0 = bytes.get();
+			byte b1 = bytes.get();
+			byte b2 = bytes.get();
+			byte b3 = bytes.get();
+			if (b0 == 'C' && b1 == 'R' && b2 == 'B')
+			{
+				version = b3 & 0xFF;
+				if (version > 2)
+				{
+					throw new UnsupportedVersionException("Unsupported CRBin version: " + version + " (max supported: 2)");
+				}
+			}
+			else
+			{
+				version = 1;
+				bytes.reset();
+			}
+		}
+		else
+		{
+			version = 1;
 		}
 
-		// Now read schemas
-		readSchema(schema, bytes);
-		// Now read alt schemas
-		int numAlt = ByteArrayUtils.readInt(bytes);
-		for (int i = 0; i < numAlt; i++)
+		if (version == 2)
 		{
-			var alt = new CRBinSchema();
-			readSchema(alt, bytes);
-			altSchemas.add(alt);
+			// Read strings in V2
+			int numStrings = ByteArrayUtils.readVarInt(bytes);
+			strings = DynamicArrays.getNew(String.class, numStrings);
+			for (int i = 0; i < numStrings; i++)
+			{
+				int len = ByteArrayUtils.readVarInt(bytes);
+				if (len == -1)
+				{
+					strings.add(null);
+				}
+				else
+				{
+					byte[] strBytes = new byte[len];
+					bytes.get(strBytes);
+					strings.add(new String(strBytes, StandardCharsets.UTF_8));
+				}
+			}
+
+			// Read schemas in V2
+			readSchema(schema, bytes);
+
+			// Read alt schemas in V2
+			int numAlt = ByteArrayUtils.readVarInt(bytes);
+			for (int i = 0; i < numAlt; i++)
+			{
+				var alt = new CRBinSchema();
+				readSchema(alt, bytes);
+				altSchemas.add(alt);
+			}
 		}
+		else
+		{
+			// Read strings in V1
+			int numStrings = ByteArrayUtils.readInt(bytes);
+			strings = DynamicArrays.getNew(String.class, numStrings);
+			for (int i = 0; i < numStrings; i++)
+			{
+				strings.add(ByteArrayUtils.readString(bytes));
+			}
+
+			// Read schemas in V1
+			readSchema(schema, bytes);
+
+			// Read alt schemas in V1
+			int numAlt = ByteArrayUtils.readInt(bytes);
+			for (int i = 0; i < numAlt; i++)
+			{
+				var alt = new CRBinSchema();
+				readSchema(alt, bytes);
+				altSchemas.add(alt);
+			}
+		}
+
 		// Now read actual data:
 		readDataFromSchema(schema, bytes);
 	}

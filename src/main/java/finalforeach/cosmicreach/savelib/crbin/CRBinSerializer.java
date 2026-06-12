@@ -1,6 +1,7 @@
 package finalforeach.cosmicreach.savelib.crbin;
 
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Objects;
@@ -68,26 +69,65 @@ public class CRBinSerializer
 		return toByteArray().toArray();
 	}
 
+	private void registerStringInPool(String value)
+	{
+		if (value == null) return;
+		int stringId = strings.indexOf(value, false);
+		if (stringId == -1)
+		{
+			strings.add(value);
+		}
+	}
+
 	public void writeToByteArray(IByteArray bytesToWrite)
 	{
-		// First write all common strings
-		ByteArrayUtils.writeInt(bytesToWrite, strings.size());
+		// 1. Gather all schema names and add them to the strings pool
+		for (var item : schema.getSchema())
+		{
+			registerStringInPool(item.name);
+		}
+		for (int a = 0; a < altSchemas.size(); a++)
+		{
+			var alt = altSchemas.get(a);
+			for (var item : alt.getSchema())
+			{
+				registerStringInPool(item.name);
+			}
+		}
+
+		// 2. Write V2 Header
+		bytesToWrite.add((byte) 'C');
+		bytesToWrite.add((byte) 'R');
+		bytesToWrite.add((byte) 'B');
+		bytesToWrite.add((byte) 2);
+
+		// 3. Write all common strings with VarInt string counts and lengths
+		ByteArrayUtils.writeVarInt(bytesToWrite, strings.size());
 		for (String s : strings)
 		{
-			ByteArrayUtils.writeString(bytesToWrite, s);
+			if (s == null)
+			{
+				ByteArrayUtils.writeVarInt(bytesToWrite, -1);
+			}
+			else
+			{
+				byte[] strBytes = s.getBytes(StandardCharsets.UTF_8);
+				ByteArrayUtils.writeVarInt(bytesToWrite, strBytes.length);
+				bytesToWrite.addAll(strBytes);
+			}
 		}
 
-		// Then write the bytes of the current schema
-		bytesToWrite.addAll(schema.getBytes());
+		// 4. Write the bytes of the current schema
+		bytesToWrite.addAll(schema.getBytes(strings));
 
-		// Then write the bytes of the other schemas
-		ByteArrayUtils.writeInt(bytesToWrite, altSchemas.size());
-		for (var s : altSchemas)
+		// 5. Write the bytes of the other schemas
+		ByteArrayUtils.writeVarInt(bytesToWrite, altSchemas.size());
+		for (int i = 0; i < altSchemas.size(); i++)
 		{
-			bytesToWrite.addAll(s.getBytes());
+			bytesToWrite.addAll(altSchemas.get(i).getBytes(strings));
 		}
 
-		// Then write the binary data
+		// 6. Write the binary data
 		bytesToWrite.addAll(bytes);
 	}
 
@@ -106,13 +146,13 @@ public class CRBinSerializer
 	private void writeNullArray(String name, SchemaType type)
 	{
 		schema.add(name, type);
-		ByteArrayUtils.writeInt(bytes, -1);
+		ByteArrayUtils.writeVarInt(bytes, -1);
 	}
 
 	public void writeArray(String name, SchemaType type, int arrayLength, IntConsumer forEach)
 	{
 		schema.add(name, type);
-		ByteArrayUtils.writeInt(bytes, arrayLength);
+		ByteArrayUtils.writeVarInt(bytes, arrayLength);
 		for (int i = 0; i < arrayLength; i++)
 		{
 			forEach.accept(i);
@@ -122,7 +162,7 @@ public class CRBinSerializer
 	public void writeArray(String name, SchemaType type, int offset, int arrayLength, IntConsumer forEach)
 	{
 		schema.add(name, type);
-		ByteArrayUtils.writeInt(bytes, arrayLength);
+		ByteArrayUtils.writeVarInt(bytes, arrayLength);
 		for (int i = offset; i < arrayLength; i++)
 		{
 			forEach.accept(i);
@@ -136,7 +176,27 @@ public class CRBinSerializer
 
 	public void writeBooleanArray(String name, boolean[] array)
 	{
-		writeArray(name, SchemaType.BOOLEAN_ARRAY, array.length, (i) -> writeBoolean(null, array[i]));
+		if (array == null)
+		{
+			writeNullArray(name, SchemaType.BOOLEAN_ARRAY);
+			return;
+		}
+		schema.add(name, SchemaType.BOOLEAN_ARRAY);
+		ByteArrayUtils.writeVarInt(bytes, array.length);
+		int numBytes = (array.length + 7) / 8;
+		for (int bIdx = 0; bIdx < numBytes; bIdx++)
+		{
+			byte b = 0;
+			for (int bit = 0; bit < 8; bit++)
+			{
+				int arrIdx = bIdx * 8 + bit;
+				if (arrIdx < array.length && array[arrIdx])
+				{
+					b |= (1 << bit);
+				}
+			}
+			ByteArrayUtils.writeByte(bytes, b);
+		}
 	}
 
 	public void writeShortArray(String name, short[] array)
@@ -249,7 +309,7 @@ public class CRBinSerializer
 	public void writeInt(String name, int i)
 	{
 		schema.add(name, SchemaType.INT);
-		ByteArrayUtils.writeInt(bytes, i);
+		ByteArrayUtils.writeVarInt(bytes, i);
 	}
 
 	public void writeShort(String name, short s)
@@ -291,7 +351,7 @@ public class CRBinSerializer
 		}
 
 		// Write the string's ID
-		ByteArrayUtils.writeInt(bytes, stringId);
+		ByteArrayUtils.writeVarInt(bytes, stringId);
 
 	}
 
@@ -339,13 +399,13 @@ public class CRBinSerializer
 				var s = altSchemas.get(i);
 				if (s.equals(schema))
 				{
-					ByteArrayUtils.writeInt(oldBytes, i);
+					ByteArrayUtils.writeVarInt(oldBytes, i);
 					break;
 				}
 			}
 		} else
 		{
-			ByteArrayUtils.writeInt(oldBytes, -1);
+			ByteArrayUtils.writeVarInt(oldBytes, -1);
 		}
 
 		oldBytes.addAll(bytes);

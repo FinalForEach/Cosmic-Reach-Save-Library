@@ -115,6 +115,36 @@ public class CRBinSchema
 		return bytes;
 	}
 
+	public byte[] getBytes(IDynamicArray<String> strings)
+	{
+		int byteCount = 0;
+		for (var item : schema)
+		{
+			byteCount++; // For the schema item type
+			int stringId = strings.indexOf(item.name, false);
+			int zz = (stringId << 1) ^ (stringId >> 31);
+			int sz = 1;
+			while ((zz & ~0x7F) != 0)
+			{
+				sz++;
+				zz >>>= 7;
+			}
+			byteCount += sz;
+		}
+		byteCount++; // SCHEMA_END
+
+		byte[] bytes = new byte[byteCount];
+		int byteIdx = 0;
+		for (var item : schema)
+		{
+			byteIdx = RawByteArrayUtils.writeByte(byteIdx, bytes, item.type.byteId);
+			int stringId = strings.indexOf(item.name, false);
+			byteIdx = RawByteArrayUtils.writeVarInt(byteIdx, bytes, stringId);
+		}
+		byteIdx = RawByteArrayUtils.writeByte(byteIdx, bytes, SchemaType.SCHEMA_END.byteId);
+		return bytes;
+	}
+
 	@Override
 	public int hashCode()
 	{

@@ -38,4 +38,16 @@ public class RawByteArrayUtils
 		offset+=strBytes.length;
 		return offset;
 	}
+
+	public static int writeVarInt(int offset, byte[] byteArr, int value)
+	{
+		int zz = (value << 1) ^ (value >> 31);
+		while ((zz & ~0x7F) != 0)
+		{
+			byteArr[offset++] = (byte) ((zz & 0x7F) | 0x80);
+			zz >>>= 7;
+		}
+		byteArr[offset++] = (byte) zz;
+		return offset;
+	}
 }

@@ -123,5 +123,31 @@ public class ByteArrayUtils
 		byteArr.addAll(strBytes);
 	}
 
+	public static void writeVarInt(IByteArray byteArr, int value)
+	{
+		int zz = (value << 1) ^ (value >> 31);
+		while ((zz & ~0x7F) != 0)
+		{
+			byteArr.add((byte) ((zz & 0x7F) | 0x80));
+			zz >>>= 7;
+		}
+		byteArr.add((byte) zz);
+	}
 
+	public static int readVarInt(ByteBuffer bytes)
+	{
+		int zz = 0;
+		int shift = 0;
+		while (true)
+		{
+			byte b = bytes.get();
+			zz |= (b & 0x7F) << shift;
+			if ((b & 0x80) == 0)
+			{
+				break;
+			}
+			shift += 7;
+		}
+		return (zz >>> 1) ^ -(zz & 1);
+	}
 }
