@@ -87,7 +87,7 @@ public class LightDataCompactor
 					{
 						for(int k = 0; k < CHUNK_WIDTH; k++) 
 						{
-							short light = shortLayer.getBlockLight(i, k);
+							long light = shortLayer.getBlockLight(i, k);
 							int sr = (byte)((light & 0xF00) >> 8);
 							int sg = (byte)((light & 0x0F0) >> 4);
 							int sb = (byte)((light & 0x00F));

@@ -13,9 +13,21 @@ public interface IBlockLightLayer extends ISaveFileConstant
 {
 	final int CHUNK_WIDTH = ISavedChunk.CHUNK_WIDTH;
 
-	short getBlockLight(int localX, int localZ);
+	long getBlockLight(int localX, int localZ);
 
-	void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int localX, int localZ);
+	default void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int localX, int localZ)
+	{
+		setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, 0, localX, localZ);
+	}
+
+	default void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int lightLevelOrange, int localX, int localZ)
+	{
+		setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, lightLevelOrange, 0, 0, 0, 0, 0, localX, localZ);
+	}
+
+	void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int lightLevelOrange,
+			int lightLevelLime, int lightLevelMint, int lightLevelAzure, int lightLevelViolet, int lightLevelRose,
+			int localX, int localZ);
 
 	void writeTo(IChunkByteWriter allChunksWriter);
 
@@ -34,7 +46,13 @@ public interface IBlockLightLayer extends ISaveFileConstant
 		}
 		case SaveFileConstants.BLOCKLIGHTDATA_LAYER_SHORT:
 		{
-			var layer = BlockLightShortLayer.readFrom(reader);
+			var layer = BlockLightShortLayer.readFrom(reader, blockLightLayeredData, yLevel);
+			blockLightLayeredData.setLayer(yLevel, layer);
+			return layer;								
+		}
+		case SaveFileConstants.BLOCKLIGHTDATA_LAYER_LONG:
+		{
+			var layer = BlockLightLongLayer.readFrom(reader, blockLightLayeredData, yLevel);
 			blockLightLayeredData.setLayer(yLevel, layer);
 			return layer;								
 		}
@@ -85,10 +103,10 @@ public interface IBlockLightLayer extends ISaveFileConstant
 		{
 			for(int k = 0; k < CHUNK_WIDTH; k++) 
 			{
-				int l = getBlockLight(i, k);
-				int r = (l & 0xF00) >> 8;
-				int g = (l & 0x0F0) >> 4;
-				int b = (l & 0x00F);
+				long l = getBlockLight(i, k);
+				int r = (int) ((l & 0xF00) >> 8);
+				int g = (int) ((l & 0x0F0) >> 4);
+				int b = (int) (l & 0x00F);
 				d[di++] = new DebugLightInfo(r, g, b);
 			}
 		}

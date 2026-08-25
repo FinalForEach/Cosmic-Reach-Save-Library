@@ -12,9 +12,21 @@ import finalforeach.cosmicreach.savelib.lightdata.blocklight.layers.IBlockLightL
 
 public interface IBlockLightData extends ISaveFileConstant
 {
-	short getBlockLight(int localX, int localY, int localZ);
+	long getBlockLight(int localX, int localY, int localZ);
 
-	void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int localX, int localY, int localZ);
+	default void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int localX, int localY, int localZ)
+	{
+		setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, 0, localX, localY, localZ);
+	}
+
+	default void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int lightLevelOrange, int localX, int localY, int localZ)
+	{
+		setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, lightLevelOrange, 0, 0, 0, 0, 0, localX, localY, localZ);
+	}
+
+	void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int lightLevelOrange,
+			int lightLevelLime, int lightLevelMint, int lightLevelAzure, int lightLevelViolet, int lightLevelRose,
+			int localX, int localY, int localZ);
 
 	void writeTo(IChunkByteWriter allChunksWriter);
 

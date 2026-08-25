@@ -18,34 +18,41 @@ public class BlockLightSingleLayer implements IBlockLightLayer
 	}
 
 	@Override
-	public short getBlockLight(int localX, int localZ)
+	public long getBlockLight(int localX, int localZ)
 	{
-		return lightLevel;
+		return (long) (lightLevel & 0xFFFFL);
 	}
 
 	@Override
 	public void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int localX, int localZ)
 	{
-		short newLightLevel = (short)((lightLevelRed << 8) + (lightLevelGreen << 4) + lightLevelBlue);
-		if(newLightLevel != lightLevel) 
+		setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, 0, localX, localZ);
+	}
+
+	@Override
+	public void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int lightLevelOrange, int localX, int localZ)
+	{
+		setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, lightLevelOrange, 0, 0, 0, 0, 0, localX, localZ);
+	}
+
+	@Override
+	public void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int lightLevelOrange,
+			int lightLevelLime, int lightLevelMint, int lightLevelAzure, int lightLevelViolet, int lightLevelRose,
+			int localX, int localZ)
+	{
+		if (lightLevelLime > 0 || lightLevelMint > 0 || lightLevelAzure > 0 || lightLevelViolet > 0 || lightLevelRose > 0)
 		{
-			int oldR = ((byte)((lightLevel & 0xF00) >> 8));
-			int oldG = ((byte)((lightLevel & 0x0F0) >> 4));
-			int oldB = ((byte)((lightLevel & 0x00F)));
-
-			IBlockLightLayer lightLayer = null;
-			if(oldR!=lightLevelRed && oldG == lightLevelGreen && oldB == lightLevelBlue) 
-			{
-				//lightLayer = new BlockLightMonoRedNibbleLayer(lightData, yLevel, lightLevel);
-				//lightLayer.setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, localX, localZ);
-			}
-
-			if(lightLayer == null)
-			{
-				lightLayer = new BlockLightShortLayer(lightLevel);
-				lightLayer.setBlockLight(lightLevelRed, lightLevelGreen,lightLevelBlue, localX, localZ);
-			}
-
+			IBlockLightLayer lightLayer = new BlockLightLongLayer((long) (lightLevel & 0xFFFFL));
+			lightLayer.setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, lightLevelOrange, lightLevelLime,
+					lightLevelMint, lightLevelAzure, lightLevelViolet, lightLevelRose, localX, localZ);
+			lightData.setLayer(yLevel, lightLayer);
+			return;
+		}
+		short newLightLevel = (short) ((lightLevelOrange << 12) + (lightLevelRed << 8) + (lightLevelGreen << 4) + lightLevelBlue);
+		if (newLightLevel != lightLevel)
+		{
+			IBlockLightLayer lightLayer = new BlockLightShortLayer(lightData, yLevel, lightLevel);
+			lightLayer.setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, lightLevelOrange, localX, localZ);
 			lightData.setLayer(yLevel, lightLayer);
 		}
 	}

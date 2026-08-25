@@ -20,7 +20,7 @@ public class BlockLightLayeredData implements IBlockLightData
 	}
 
 	@Override
-	public short getBlockLight(int localX, int localY, int localZ)
+	public long getBlockLight(int localX, int localY, int localZ)
 	{
 		return layers[localY].getBlockLight(localX, localZ);
 	}
@@ -30,6 +30,22 @@ public class BlockLightLayeredData implements IBlockLightData
 			int localX, int localY, int localZ)
 	{
 		layers[localY].setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, localX, localZ);
+	}
+
+	@Override
+	public void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int lightLevelOrange,
+			int localX, int localY, int localZ)
+	{
+		layers[localY].setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, lightLevelOrange, localX, localZ);
+	}
+
+	@Override
+	public void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int lightLevelOrange,
+			int lightLevelLime, int lightLevelMint, int lightLevelAzure, int lightLevelViolet, int lightLevelRose,
+			int localX, int localY, int localZ)
+	{
+		layers[localY].setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, lightLevelOrange, lightLevelLime,
+				lightLevelMint, lightLevelAzure, lightLevelViolet, lightLevelRose, localX, localZ);
 	}
 
 	public void setLayer(int yLevel, IBlockLightLayer layer) {
