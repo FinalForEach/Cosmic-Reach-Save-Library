@@ -25,6 +25,20 @@ public interface IChunkByteWriter
 		}
 	}
 
+	default void writeLong(long l)
+	{
+		writeInt((int) (l >> 32));
+		writeInt((int) l);
+	}
+
+	default void writeLongs(long[] longs)
+	{
+		for (long l : longs)
+		{
+			writeLong(l);
+		}
+	}
+
 	default void writeShorts(short[] shorts)
 	{
 		for (short s : shorts)

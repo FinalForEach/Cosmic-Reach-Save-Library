@@ -34,13 +34,13 @@ public abstract class BlockLightMonoNibbleLayer implements IBlockLightLayer
 	}
 
 	@Override
-	public short getBlockLight(int localX, int localZ) 
+	public long getBlockLight(int localX, int localZ) 
 	{
 		int r = getRed(localX, localZ);
 		int g = getGreen(localX, localZ);
 		int b = getBlue(localX, localZ);
 
-		return (short)((r << 8) + (g << 4) + b);
+		return (long) (((r << 8) + (g << 4) + b) & 0xFFFFL);
 	}
 
 	protected int getRed(int localX, int localZ)
@@ -141,6 +141,55 @@ public abstract class BlockLightMonoNibbleLayer implements IBlockLightLayer
 				setNibbleLight(lightLevelBlue, localX, localZ);
 			}
 		}
+	}
+
+	@Override
+	public void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int lightLevelOrange, int localX, int localZ)
+	{
+		setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, lightLevelOrange, 0, 0, 0, 0, 0, localX, localZ);
+	}
+
+	@Override
+	public void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int lightLevelOrange,
+			int lightLevelLime, int lightLevelMint, int lightLevelAzure, int lightLevelViolet, int lightLevelRose,
+			int localX, int localZ)
+	{
+		if (lightLevelLime > 0 || lightLevelMint > 0 || lightLevelAzure > 0 || lightLevelViolet > 0 || lightLevelRose > 0)
+		{
+			final var longLayer = new BlockLightLongLayer();
+			for (int i = 0; i < CHUNK_WIDTH; i++)
+			{
+				for (int k = 0; k < CHUNK_WIDTH; k++)
+				{
+					int red = getRed(i, k);
+					int green = getGreen(i, k);
+					int blue = getBlue(i, k);
+					longLayer.setBlockLight(red, green, blue, 0, 0, 0, 0, 0, 0, i, k);
+				}
+			}
+			longLayer.setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, lightLevelOrange, lightLevelLime,
+					lightLevelMint, lightLevelAzure, lightLevelViolet, lightLevelRose, localX, localZ);
+			lightData.setLayer(yLevel, longLayer);
+			return;
+		}
+		if (lightLevelOrange > 0)
+		{
+			final var shortLayer = new BlockLightShortLayer(lightData, yLevel, baseLightLevel);
+			for (int i = 0; i < CHUNK_WIDTH; i++)
+			{
+				for (int k = 0; k < CHUNK_WIDTH; k++)
+				{
+					int red = getRed(i, k);
+					int green = getGreen(i, k);
+					int blue = getBlue(i, k);
+					shortLayer.setBlockLight(red, green, blue, 0, i, k);
+				}
+			}
+			shortLayer.setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, lightLevelOrange, localX, localZ);
+			lightData.setLayer(yLevel, shortLayer);
+			return;
+		}
+		setBlockLight(lightLevelRed, lightLevelGreen, lightLevelBlue, localX, localZ);
 	}
 
 	@Override

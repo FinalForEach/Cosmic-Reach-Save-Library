@@ -9,6 +9,13 @@ public interface IChunkByteReader
 	String readString() throws IOException;
 	short readShort() throws IOException;
 
+	default long readLong() throws IOException
+	{
+		long high = (long) readInt() << 32;
+		long low = (long) readInt() & 0xFFFFFFFFL;
+		return high | low;
+	}
+
 	default void readFully(byte[] bytes) throws IOException 
 	{
 		int len = bytes.length;
