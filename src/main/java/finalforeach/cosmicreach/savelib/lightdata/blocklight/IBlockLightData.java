@@ -12,6 +12,32 @@ import finalforeach.cosmicreach.savelib.lightdata.blocklight.layers.IBlockLightL
 
 public interface IBlockLightData extends ISaveFileConstant
 {
+	public static final IBlockLightData NEEDS_CALCULATION = new IBlockLightData()
+	{
+		@Override
+		public int getSaveFileConstant()
+		{
+			return SaveFileConstants.BLOCKLIGHTDATA_NEEDS_CALCULATION;
+		}
+
+		@Override
+		public short getBlockLight(int localX, int localY, int localZ)
+		{
+			return 0;
+		}
+
+		@Override
+		public void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int localX, int localY,
+				int localZ)
+		{
+		}
+
+		@Override
+		public void writeTo(IChunkByteWriter allChunksWriter)
+		{
+		}
+	};
+
 	short getBlockLight(int localX, int localY, int localZ);
 
 	void setBlockLight(int lightLevelRed, int lightLevelGreen, int lightLevelBlue, int localX, int localY, int localZ);
@@ -25,6 +51,8 @@ public interface IBlockLightData extends ISaveFileConstant
 		{
 		case SaveFileConstants.BLOCKLIGHTDATA_NULL:
 			return null;
+		case SaveFileConstants.BLOCKLIGHTDATA_NEEDS_CALCULATION:
+			return NEEDS_CALCULATION;
 		case SaveFileConstants.BLOCKLIGHTDATA_LAYERED: {
 			final var blockLightLayeredData = new BlockLightLayeredData();
 
